@@ -30,13 +30,12 @@
       </div>
     </div>
   </div>
-  <div :style="{ height: '1500px' }"></div>
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance, onMounted } from "vue";
+import { ref, getCurrentInstance, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-
+//全局变量
 const { proxy } = getCurrentInstance();
 const router = useRouter();
 const route = useRoute();
