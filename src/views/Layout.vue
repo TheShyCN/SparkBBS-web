@@ -24,17 +24,24 @@
           发帖<span class="iconfont icon-add"></span>
         </el-button>
         <el-button-group>
-          <el-button type="primary" plain> 登录 </el-button>
-          <el-button type="primary" plain> 注册 </el-button>
+          <el-button type="primary" plain @click="loginAndRegister(1)">
+            登录
+          </el-button>
+          <el-button type="primary" plain @click="loginAndRegister(0)">
+            注册
+          </el-button>
         </el-button-group>
       </div>
     </div>
   </div>
+  <!-- 登录注册页面 -->
+  <LoginAndRegister ref="loginAndRegisterRef" />
 </template>
 
 <script setup>
 import { ref, getCurrentInstance, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import LoginAndRegister from "@/views/LoginAndRegister.vue";
 //全局变量
 const { proxy } = getCurrentInstance();
 const router = useRouter();
@@ -103,6 +110,13 @@ const initScroll = () => {
     }
     initScrollTop = currentScrollTop;
   });
+};
+
+// 登录注册
+//登录注册组件的实例
+const loginAndRegisterRef = ref(null);
+const loginAndRegister = (type) => {
+  loginAndRegisterRef.value.showPanel(type);
 };
 
 onMounted(() => {

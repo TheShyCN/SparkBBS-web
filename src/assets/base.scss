@@ -24,3 +24,13 @@
   background: #ededed;
   border-radius: 10px;
 }
+
+:root {
+  --link: #409eff;
+}
+
+// 链接的样式
+.a-link {
+  color: var(--link);
+  text-decoration: none;
+}
