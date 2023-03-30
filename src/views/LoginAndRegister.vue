@@ -20,6 +20,7 @@
             clearable
             placeholder="请输入邮箱"
             v-model.trim="formData.email"
+            max-length="150"
           >
             <template #prefix>
               <span class="iconfont icon-account"></span>
@@ -64,9 +65,28 @@
                   <span class="iconfont icon-checkcode"></span>
                 </template>
               </el-input>
-              <el-button type="primary" class="send-btn" size="large"
+              <el-button
+                type="primary"
+                class="send-btn"
+                size="large"
+                @click="showEmailDialog"
                 >获取验证码</el-button
               >
+            </div>
+            <div>
+              <el-popover placement="left" :width="450" trigger="click">
+                <div>
+                  <p>1、在垃圾箱中查找邮箱验证码</p>
+                  <p>
+                    2、在邮箱中 头像->设置->反垃圾->白名单->设置邮件地址白名单
+                  </p>
+                  <p>3、将邮箱【zhuhaohe.ts@qq.com】添加到白名单</p>
+                  <a href="" target="_blank" class="a-link">不知道怎么设置?</a>
+                </div>
+                <template #reference>
+                  <span class="a-link">未获取到验证码?</span>
+                </template>
+              </el-popover>
             </div>
           </el-form-item>
 
@@ -75,6 +95,7 @@
               clearable
               placeholder="请输入昵称"
               v-model.trim="formData.nickName"
+              max-length="20"
             >
               <template #prefix>
                 <span class="iconfont icon-account"></span>
@@ -202,12 +223,51 @@
         </el-form-item>
       </el-form>
     </Dialog>
+    <Dialog
+      :show="dialogConfigSendMailCode.show"
+      :title="dialogConfigSendMailCode.title"
+      :buttons="dialogConfigSendMailCode.buttons"
+      width="500px"
+      :showCancel="false"
+      @close="dialogConfigSendMailCode.show = false"
+    >
+      <el-form
+        :model="formDataSendMailCode"
+        :rules="rules"
+        ref="formDataSendMailCodeRef"
+        label-width="80px"
+        @submit.prevent
+      >
+        <el-form-item label="邮箱">
+          {{ formDataSendMailCode.email }}
+        </el-form-item>
+        <el-form-item prop="checkCode" label="验证码">
+          <div class="check-code-panel">
+            <el-input
+              clearable
+              placeholder="请输入验证码"
+              v-model.trim="formDataSendMailCode.checkCode"
+            >
+              <template #prefix>
+                <span class="iconfont icon-checkcode"></span>
+              </template>
+            </el-input>
+            <img
+              :src="checkCodeSendMailCodeUrl"
+              alt="checkCode"
+              @click="changeCheckCode(1)"
+            />
+          </div>
+        </el-form-item>
+      </el-form>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, nextTick } from "vue";
+import { ref, reactive, nextTick, getCurrentInstance, onMounted } from "vue";
 
+const { proxy } = getCurrentInstance();
 const api = {
   checkCode: "/api/checkCode",
 };
@@ -224,11 +284,18 @@ defineExpose({ showPanel });
 
 //验证码
 const checkCodeUrl = ref(api.checkCode);
+const checkCodeSendMailCodeUrl = ref(api.checkCode);
 //更换验证码
 const changeCheckCode = (type) => {
-  checkCodeUrl.value = `${
-    api.checkCode
-  }?type=${type}&time=${new Date().getTime()}`;
+  if (type === 0) {
+    checkCodeUrl.value = `${
+      api.checkCode
+    }?type=${type}&time=${new Date().getTime()}`;
+  } else {
+    checkCodeSendMailCodeUrl.value = `${
+      api.checkCode
+    }?type=${type}&time=${new Date().getTime()}`;
+  }
 };
 
 //控制密码显示隐藏
@@ -244,13 +311,70 @@ const eyeChange = (eyeType) => {
 
 const formData = ref({});
 const formDataRef = ref();
+
+const formDataSendMailCode = ref({});
+const formDataSendMailCodeRef = ref();
+
+const checkRepeatPassword = (rule, value, callback) => {
+  if (value !== formData.value.regPassword) {
+    callback(new Error(rule.message));
+  } else {
+    callback();
+  }
+};
+onMounted(() => {
+  // console.log(proxy.Verify.email);
+});
+
 const rules = {
-  title: [{ required: true, message: "请输入内容" }],
+  email: [
+    { required: true, message: "请输入邮箱!" },
+    { validator: proxy.Verify.email, message: "请输入正确的邮箱!" },
+  ],
+  password: [{ required: true, message: "请输入密码!" }],
+  emailCode: [{ required: true, message: "请输入验证码!" }],
+  checkCode: [{ required: true, message: "请输入图片中的验证码!" }],
+  nickName: [{ required: true, message: "请输入昵称!" }],
+  regPassword: [
+    { required: true, message: "请输入密码" },
+    {
+      validator: proxy.Verify.password,
+      message: "8-18位且同时包含数字和字母",
+    },
+  ],
+  confirmRegPassword: [
+    { required: true, message: "请再次输入密码!" },
+    {
+      validator: checkRepeatPassword,
+      message: "两次密码输入不一致!",
+    },
+  ],
 };
 const dialogConfig = reactive({
   show: false,
-  title: "标题",
 });
+const dialogConfigSendMailCode = reactive({
+  show: false,
+  title: "发送邮箱验证码",
+  buttons: [
+    {
+      type: "primary",
+      text: "发送验证码",
+      click: () => {
+        sendEmailCode();
+      },
+    },
+  ],
+});
+const sendEmailCode = () => {
+  formDataSendMailCodeRef.value.validateField("checkCode", (valid) => {
+    if (!valid) {
+      return;
+    } else {
+      console.log("请求后台发送验证码");
+    }
+  });
+};
 
 //重置表单
 const resetForm = () => {
@@ -267,6 +391,22 @@ const resetForm = () => {
     formDataRef.value.resetFields();
   });
 };
+//显示获取邮箱验证码的Dialog
+const showEmailDialog = () => {
+  //校验邮箱是否合法
+  formDataRef.value.validateField("email", (valid) => {
+    if (!valid) {
+      return;
+    }
+    dialogConfigSendMailCode.show = true;
+    nextTick(() => {
+      formDataSendMailCodeRef.value.resetFields();
+      formDataSendMailCode.value = {
+        email: formData.value.email,
+      };
+    });
+  });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -276,13 +416,6 @@ const resetForm = () => {
     display: flex;
     .send-btn {
       margin-left: 5px;
-    }
-  }
-  .check-code-panel {
-    display: flex;
-    img {
-      margin-left: 5px;
-      cursor: pointer;
     }
   }
   .rememberme-panel {
@@ -296,5 +429,19 @@ const resetForm = () => {
   .op-btn {
     width: 100%;
   }
+  span {
+    cursor: pointer;
+    font-size: 14px;
+  }
+}
+.check-code-panel {
+  display: flex;
+  img {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+}
+.el-form-item {
+  align-items: center;
 }
 </style>
