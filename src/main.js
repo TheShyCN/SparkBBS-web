@@ -15,6 +15,8 @@ import "@/assets/icon/iconfont.css";
 import "normalize.css";
 //全局组件
 import Dialog from "@/components/Dialog.vue";
+//全局方法
+import Verify from "./utils/Verify";
 
 const app = createApp(App);
 
@@ -26,5 +28,7 @@ app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.globalInfo = {
   bodyWidth: 1300,
 };
+//定义全局方法
+app.config.globalProperties.Verify = Verify;
 
 app.mount("#app");
