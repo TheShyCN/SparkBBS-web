@@ -270,6 +270,7 @@ import { ref, reactive, nextTick, getCurrentInstance, onMounted } from "vue";
 const { proxy } = getCurrentInstance();
 const api = {
   checkCode: "/api/checkCode",
+  sendEmailCode: "/sendEmailCode",
 };
 
 //注册:0 登录:1 重置密码:2
@@ -367,12 +368,24 @@ const dialogConfigSendMailCode = reactive({
   ],
 });
 const sendEmailCode = () => {
-  formDataSendMailCodeRef.value.validateField("checkCode", (valid) => {
+  formDataSendMailCodeRef.value.validateField("checkCode", async (valid) => {
     if (!valid) {
       return;
-    } else {
-      console.log("请求后台发送验证码");
     }
+    const params = Object.assign({}, formDataSendMailCode.value);
+    params.type = 0;
+    const result = await proxy.Request({
+      url: api.sendEmailCode,
+      params,
+      errorCallback: () => {
+        changeCheckCode(1);
+      },
+    });
+    if (!result) {
+      return;
+    }
+    proxy.Message.success("验证码发送成功,请登录邮箱查看!");
+    dialogConfigSendMailCode.show = false;
   });
 };
 

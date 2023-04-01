@@ -15,8 +15,14 @@ import "@/assets/icon/iconfont.css";
 import "normalize.css";
 //全局组件
 import Dialog from "@/components/Dialog.vue";
+// import Loading from "@/components/Loading.vue";
 //全局方法
+//表单校验
 import Verify from "./utils/Verify";
+//提示信息
+import Message from "./utils/Message";
+//ajax请求
+import Request from "./utils/Request";
 
 const app = createApp(App);
 
@@ -30,5 +36,7 @@ app.config.globalProperties.globalInfo = {
 };
 //定义全局方法
 app.config.globalProperties.Verify = Verify;
+app.config.globalProperties.Message = Message;
+app.config.globalProperties.Request = Request;
 
 app.mount("#app");
