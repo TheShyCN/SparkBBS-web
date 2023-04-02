@@ -2,8 +2,6 @@ import axios from "axios";
 import Message from "@/utils/Message";
 //自定义Loading组件
 import { load } from "@/utils/Loading";
-import { useUserStore } from "@/store/user";
-const userStore = useUserStore();
 
 const contentTypeForm = "application/x-www-form-urlencoded;charset=UTF-8";
 const contentTypeJson = "application/json";

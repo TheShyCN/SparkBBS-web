@@ -22,14 +22,17 @@ import Avatar from "@/components/Avatar.vue";
 import Verify from "./utils/Verify";
 //提示信息
 import Message from "./utils/Message";
-//ajax请求
-import Request from "./utils/Request";
+
 //引入状态管理工具--pinia
 import { createPinia } from "pinia";
+import { useUserStore } from "./store/user";
 const pinia = createPinia();
 const app = createApp(App);
-
 app.use(pinia);
+//在Request中会使用到userStore,先定义,再引入
+const userStore = useUserStore();
+//ajax请求
+import Request from "./utils/Request";
 app.component("Dialog", Dialog);
 app.component("Avatar", Avatar);
 app.use(router);
