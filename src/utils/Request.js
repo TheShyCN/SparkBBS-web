@@ -2,6 +2,8 @@ import axios from "axios";
 import Message from "@/utils/Message";
 //自定义Loading组件
 import { load } from "@/utils/Loading";
+import { useUserStore } from "@/store/user";
+const userStore = useUserStore();
 
 const contentTypeForm = "application/x-www-form-urlencoded;charset=UTF-8";
 const contentTypeJson = "application/json";
@@ -39,6 +41,8 @@ instance.interceptors.response.use(
     if (responseData.code === 200) {
       return responseData;
     } else if (responseData.code === 901) {
+      userStore.updateShowLogin(true);
+      userStore.updateLoginUserInfo(null);
       return Promise.reject({ showError: false, msg: "登录超时" });
     } else {
       if (errorCallback) {

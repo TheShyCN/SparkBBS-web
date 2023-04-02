@@ -23,7 +23,36 @@
         <el-button type="primary">
           发帖<span class="iconfont icon-add"></span>
         </el-button>
-        <el-button-group>
+        <template v-if="userInfo.userId">
+          <div class="message-info">
+            <el-dropdown>
+              <el-badge :value="2" class="item">
+                <div class="iconfont icon-message"></div>
+              </el-badge>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>回复我的</el-dropdown-item>
+                  <el-dropdown-item>赞了我的文章</el-dropdown-item>
+                  <el-dropdown-item>下载了我的附件</el-dropdown-item>
+                  <el-dropdown-item>赞了我的评论</el-dropdown-item>
+                  <el-dropdown-item>系统消息</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+          <div class="user-Info">
+            <el-dropdown>
+              <Avatar userId="1890524956" :size="50"></Avatar>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>我的主页</el-dropdown-item>
+                  <el-dropdown-item>退出</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </template>
+        <el-button-group v-else>
           <el-button type="primary" plain @click="loginAndRegister(1)">
             登录
           </el-button>
@@ -34,20 +63,30 @@
       </div>
     </div>
   </div>
+  <div>
+    <router-view />
+  </div>
   <!-- 登录注册页面 -->
   <LoginAndRegister ref="loginAndRegisterRef" />
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, onMounted } from "vue";
+import { ref, getCurrentInstance, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import LoginAndRegister from "@/views/LoginAndRegister.vue";
+import { useUserStore } from "@/store/user";
+import { storeToRefs } from "pinia";
+
+const userStore = useUserStore();
 //全局变量
 const { proxy } = getCurrentInstance();
 const router = useRouter();
 const route = useRoute();
 // 控制顶部显示
 const showHeader = ref(true);
+const api = {
+  getUserInfo: "/getUserInfo",
+};
 
 // logo文字
 const logoInfo = ref([
@@ -121,6 +160,32 @@ const loginAndRegister = (type) => {
 
 onMounted(() => {
   initScroll();
+  getUserInfo();
+});
+
+const getUserInfo = async () => {
+  const result = await proxy.Request({
+    url: api.getUserInfo,
+  });
+  if (!result) return;
+  userStore.updateLoginUserInfo(result.data);
+};
+
+const userInfo = ref({});
+const { loginUserInfo, showLogin } = storeToRefs(userStore);
+//监听 登录用户信息
+watch(loginUserInfo, (newVal) => {
+  if (newVal !== undefined && newVal !== null) {
+    userInfo.value = newVal;
+  } else {
+    userInfo.value = {};
+  }
+});
+//监听是否展示登录框
+watch(showLogin, (newVal) => {
+  if (newVal) {
+    loginAndRegister(1);
+  }
 });
 </script>
 
@@ -192,8 +257,15 @@ onMounted(() => {
       width: 250px;
       display: flex;
       justify-content: space-around;
+      align-items: center;
       span {
         margin-left: 5px;
+      }
+      .message-info {
+        .icon-message {
+          font-size: 25px;
+          cursor: pointer;
+        }
       }
     }
   }

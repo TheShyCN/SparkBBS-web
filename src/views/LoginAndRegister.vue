@@ -262,6 +262,10 @@
 
 <script setup>
 import { ref, reactive, nextTick, getCurrentInstance, onMounted } from "vue";
+import md5 from "js-md5";
+import { useUserStore } from "@/store/user";
+
+const userStore = useUserStore();
 
 const { proxy } = getCurrentInstance();
 const api = {
@@ -404,6 +408,12 @@ const doSubmit = () => {
     // 登录
     else if (opType.value === 1) {
       url = api.login;
+
+      let cookieLoginInfo = proxy.VueCookies.get("loginInfo");
+      let cookiePassword = cookieLoginInfo?.password;
+      if (cookiePassword !== params.password) {
+        params.password = md5(params.password);
+      }
     }
     //重置密码
     else if (opType.value === 2) {
@@ -428,8 +438,22 @@ const doSubmit = () => {
     proxy.Message.success(`${msg}成功!`);
     if (opType.value === 0 || opType.value === 2) {
       showPanel(1);
+    } else if (opType.value === 1) {
+      userStore.updateLoginUserInfo(result.data);
+      // 记住密码
+      if (params.rememberMe) {
+        const loginInfo = {
+          email: params.email,
+          password: params.password,
+          rememberMe: params.rememberMe,
+        };
+        proxy.VueCookies.set("loginInfo", loginInfo, "7d");
+      } else {
+        proxy.VueCookies.remove("loginInfo");
+      }
+
+      dialogConfig.show = false;
     }
-    // dialogConfig.show = false;
   });
 };
 
@@ -447,6 +471,14 @@ const resetForm = () => {
     changeCheckCode(0);
     formDataRef.value.resetFields();
     formData.value = {};
+
+    //登录
+    if (opType.value === 1) {
+      const cookieLoginInfo = proxy.VueCookies.get("loginInfo");
+      if (cookieLoginInfo) {
+        formData.value = cookieLoginInfo;
+      }
+    }
   });
 };
 //显示获取邮箱验证码的Dialog

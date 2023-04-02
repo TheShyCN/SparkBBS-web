@@ -15,6 +15,7 @@ import "@/assets/icon/iconfont.css";
 import "normalize.css";
 //全局组件
 import Dialog from "@/components/Dialog.vue";
+import Avatar from "@/components/Avatar.vue";
 // import Loading from "@/components/Loading.vue";
 //全局方法
 //表单校验
@@ -23,16 +24,21 @@ import Verify from "./utils/Verify";
 import Message from "./utils/Message";
 //ajax请求
 import Request from "./utils/Request";
-
+//引入状态管理工具--pinia
+import { createPinia } from "pinia";
+const pinia = createPinia();
 const app = createApp(App);
 
+app.use(pinia);
 app.component("Dialog", Dialog);
+app.component("Avatar", Avatar);
 app.use(router);
 app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;
 //定义全局变量
 app.config.globalProperties.globalInfo = {
   bodyWidth: 1300,
+  avatarUrl: "/api/file/getAvatar/",
 };
 //定义全局方法
 app.config.globalProperties.Verify = Verify;
