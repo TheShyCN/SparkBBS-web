@@ -211,15 +211,11 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" class="op-btn" v-if="opType === 1"
-            >登录</el-button
-          >
-          <el-button type="primary" class="op-btn" v-if="opType === 0"
-            >注册</el-button
-          >
-          <el-button type="primary" class="op-btn" v-if="opType === 2"
-            >重置密码</el-button
-          >
+          <el-button type="primary" class="op-btn" @click="doSubmit">
+            <span v-if="opType === 1">登录</span>
+            <span v-if="opType === 0">注册</span>
+            <span v-if="opType === 2">重置密码</span>
+          </el-button>
         </el-form-item>
       </el-form>
     </Dialog>
@@ -271,6 +267,9 @@ const { proxy } = getCurrentInstance();
 const api = {
   checkCode: "/api/checkCode",
   sendEmailCode: "/sendEmailCode",
+  register: "/register",
+  login: "/login",
+  restPwd: "/resetPwd",
 };
 
 //注册:0 登录:1 重置密码:2
@@ -367,13 +366,14 @@ const dialogConfigSendMailCode = reactive({
     },
   ],
 });
+//获取邮箱验证码
 const sendEmailCode = () => {
   formDataSendMailCodeRef.value.validateField("checkCode", async (valid) => {
     if (!valid) {
       return;
     }
     const params = Object.assign({}, formDataSendMailCode.value);
-    params.type = 0;
+    params.type = opType.value === 0 ? 0 : 1;
     const result = await proxy.Request({
       url: api.sendEmailCode,
       params,
@@ -386,6 +386,50 @@ const sendEmailCode = () => {
     }
     proxy.Message.success("验证码发送成功,请登录邮箱查看!");
     dialogConfigSendMailCode.show = false;
+  });
+};
+//登录 注册 重置密码
+const doSubmit = () => {
+  formDataRef.value.validate(async (valid) => {
+    if (!valid) return;
+    let params = Object.assign({}, formData.value);
+    let url = null;
+    // 注册
+    if (opType.value === 0) {
+      url = api.register;
+      params.password = params.regPassword;
+      delete params.regPassword;
+      delete params.confirmRegPassword;
+    }
+    // 登录
+    else if (opType.value === 1) {
+      url = api.login;
+    }
+    //重置密码
+    else if (opType.value === 2) {
+      url = api.restPwd;
+      params.password = params.regPassword;
+      delete params.regPassword;
+      delete params.confirmRegPassword;
+    }
+    const result = await proxy.Request({
+      url,
+      params,
+      errorCallback: () => {
+        changeCheckCode(0);
+      },
+    });
+    if (!result) {
+      return;
+    }
+
+    const msg =
+      opType.value === 0 ? "注册" : opType.value === 1 ? "登录" : "重置密码";
+    proxy.Message.success(`${msg}成功!`);
+    if (opType.value === 0 || opType.value === 2) {
+      showPanel(1);
+    }
+    // dialogConfig.show = false;
   });
 };
 
@@ -402,6 +446,7 @@ const resetForm = () => {
   nextTick(() => {
     changeCheckCode(0);
     formDataRef.value.resetFields();
+    formData.value = {};
   });
 };
 //显示获取邮箱验证码的Dialog
@@ -441,6 +486,10 @@ const showEmailDialog = () => {
   }
   .op-btn {
     width: 100%;
+    height: 100%;
+    span {
+      font-size: 20px;
+    }
   }
   span {
     cursor: pointer;
