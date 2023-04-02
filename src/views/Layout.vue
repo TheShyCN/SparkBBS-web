@@ -10,7 +10,35 @@
         }}</span>
       </RouterLink>
       <!-- 版块信息 -->
-      <div class="menu-panel"></div>
+      <div class="menu-panel">
+        <div>
+          <div>
+            <span class="menu-item">全部</span>
+          </div>
+          <div v-for="(item, index) in boardList" :key="index">
+            <el-popover
+              placement="bottom-start"
+              :width="200"
+              trigger="hover"
+              v-if="item.children.length > 0"
+            >
+              <template #reference>
+                <span class="menu-item">{{ item.boardName }}</span>
+              </template>
+              <div class="sub-board-list">
+                <span
+                  class="sub-board"
+                  v-for="(subItem, index) in item.children"
+                  :key="index"
+                >
+                  {{ subItem.boardName }}
+                </span>
+              </div>
+            </el-popover>
+            <span v-else class="menu-item">{{ item.boardName }}</span>
+          </div>
+        </div>
+      </div>
       <!-- 搜索 -->
       <div class="search-box">
         <input class="search-txt" type="text" placeholder="Type to search" />
@@ -86,6 +114,7 @@ const route = useRoute();
 const showHeader = ref(true);
 const api = {
   getUserInfo: "/getUserInfo",
+  loadBoard: "/board/loadBoard",
 };
 
 // logo文字
@@ -161,6 +190,7 @@ const loginAndRegister = (type) => {
 onMounted(() => {
   initScroll();
   getUserInfo();
+  loadBoard();
 });
 
 const getUserInfo = async () => {
@@ -187,6 +217,16 @@ watch(showLogin, (newVal) => {
     loginAndRegister(1);
   }
 });
+
+//获取版块信息
+const boardList = ref([]);
+const loadBoard = async () => {
+  const result = await proxy.Request({
+    url: api.loadBoard,
+  });
+  if (!result) return;
+  boardList.value = result.data;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -208,6 +248,51 @@ watch(showLogin, (newVal) => {
     }
     .menu-panel {
       flex: 1;
+      height: 80%;
+
+      div {
+        height: 60%;
+        width: 500px;
+        display: flex;
+        align-items: center;
+        background: #d7f0f8;
+        border-radius: 50px;
+        padding: 10px;
+        div {
+          position: relative;
+          display: flex;
+          justify-content: center;
+        }
+        .menu-item {
+          font-size: 20px;
+          font-weight: 600;
+          color: #525151;
+          cursor: pointer;
+          z-index: 2;
+          transition: color 0.5s;
+        }
+        .menu-item::after {
+          content: "";
+          background: #409eff;
+          width: 100%;
+          height: 100%;
+          border-radius: 30px;
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: -1;
+          opacity: 0;
+          transition: top 0.5s, opacity 0.5s;
+        }
+        .menu-item:hover {
+          color: #fff;
+        }
+        .menu-item:hover::after {
+          top: 50%;
+          opacity: 1;
+        }
+      }
     }
     .search-box {
       margin-right: 10px;
@@ -268,6 +353,23 @@ watch(showLogin, (newVal) => {
         }
       }
     }
+  }
+}
+.sub-board-list {
+  display: flex;
+  flex-wrap: wrap;
+  .sub-board {
+    padding: 0px 10px;
+    border-radius: 20px;
+    margin-right: 10px;
+    background-color: #ddd;
+    border: 1px solid #ddd;
+    color: rgb(39, 39, 39);
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  .sub-board:hover {
+    color: var(--link);
   }
 }
 </style>
