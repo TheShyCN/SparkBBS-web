@@ -1,0 +1,107 @@
+<template>
+  <div class="article-item">
+    <div class="article-item-inner">
+      <div class="article-body">
+        <div class="user-info">
+          <Avatar :userId="data.userId" size="30"></Avatar>
+          <router-link :to="`/user/${data.userId}`" class="a-link">
+            {{ data.nickName }}
+          </router-link>
+          <el-divider direction="vertical"></el-divider>
+          <div class="post-time">
+            {{ data.postTime }} · {{ data.userIpAddress }}
+          </div>
+          <el-divider direction="vertical"></el-divider>
+          <router-link :to="'/'" class="a-link">
+            {{ data.pBoardName }}
+          </router-link>
+          <template v-if="data.boardName">
+            <el-divider direction="vertical"></el-divider>
+            <router-link :to="'/'" class="a-link">
+              {{ data.boardName }}
+            </router-link>
+          </template>
+        </div>
+        <router-link :to="'/'" class="a-link title">{{
+          data.title
+        }}</router-link>
+        <div class="summary">{{ data.summary }}</div>
+        <div class="article-info">
+          <span class="iconfont icon-eye-solid">
+            {{ data.readCount === 0 ? "阅读" : data.readCount }}
+          </span>
+          <span class="iconfont icon-good">
+            {{ data.goodCount === 0 ? "点赞" : data.goodCount }}
+          </span>
+          <span class="iconfont icon-comment">
+            {{ data.commentCount === 0 ? "评论" : data.commentCount }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+const props = defineProps({
+  data: {
+    type: Object,
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+.article-item {
+  padding: 5px 10px 0 10px;
+  .article-item-inner {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    .article-body {
+      .user-info {
+        width: 700px;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #616161;
+        margin-bottom: 15px;
+        .a-link {
+          margin-left: 10px;
+          color: #616161;
+        }
+        .a-link:hover {
+          color: var(--link);
+        }
+      }
+      .title {
+        color: black;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .title:hover {
+        color: var(--link);
+      }
+      .summary {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #616161;
+      }
+      .article-info {
+        margin-top: 15px;
+        display: flex;
+        width: 200px;
+        justify-content: space-between;
+        span {
+          color: #616161;
+          cursor: pointer;
+        }
+        span:hover {
+          color: pink;
+        }
+      }
+    }
+  }
+}
+.article-item:hover {
+  background-color: rgb(231, 243, 241);
+}
+</style>

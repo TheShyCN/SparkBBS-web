@@ -91,7 +91,7 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="body-content">
     <router-view />
   </div>
   <!-- 登录注册页面 -->
@@ -231,10 +231,13 @@ const loadBoard = async () => {
 
 <style lang="scss" scoped>
 .header {
+  top: 0;
+  background-color: #fff;
   width: 100%;
   height: 60px;
   box-shadow: 0 2px 6px 0 #ddd;
   position: fixed;
+  z-index: 1;
   .header-content {
     height: 60px;
 
@@ -255,7 +258,7 @@ const loadBoard = async () => {
         width: 500px;
         display: flex;
         align-items: center;
-        background: #d7f0f8;
+        background: #ddd;
         border-radius: 50px;
         padding: 10px;
         div {
@@ -371,5 +374,8 @@ const loadBoard = async () => {
   .sub-board:hover {
     color: var(--link);
   }
+}
+.body-content {
+  margin-top: 60px;
 }
 </style>
