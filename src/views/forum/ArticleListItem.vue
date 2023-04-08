@@ -38,11 +38,16 @@
           </span>
         </div>
       </div>
+      <!-- <div class="cover" v-if="data.cover">
+        <img :src="`/api/file/getImage/${data.cover}`" alt="" />
+      </div> -->
+      <Cover :size="100" :cover="data.cover"></Cover>
     </div>
   </div>
 </template>
 
 <script setup>
+import Cover from "@/components/Cover.vue";
 const props = defineProps({
   data: {
     type: Object,
@@ -56,7 +61,10 @@ const props = defineProps({
   .article-item-inner {
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
     .article-body {
+      max-width: 900px;
       .user-info {
         width: 700px;
         display: flex;
@@ -91,10 +99,12 @@ const props = defineProps({
         width: 200px;
         justify-content: space-between;
         span {
-          color: #616161;
+          color: #777676;
+        }
+        span:not(.icon-eye-solid) {
           cursor: pointer;
         }
-        span:hover {
+        span:not(.icon-eye-solid):hover {
           color: pink;
         }
       }

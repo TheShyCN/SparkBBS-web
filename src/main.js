@@ -42,6 +42,7 @@ app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.globalInfo = {
   bodyWidth: 1300,
   avatarUrl: "/api/file/getAvatar/",
+  imageUrl: "/api/file/getImage/",
 };
 //定义全局方法
 app.config.globalProperties.Verify = Verify;
