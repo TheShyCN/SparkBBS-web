@@ -5,11 +5,29 @@
   >
     <div class="article-panel">
       <div class="top-tab">
-        <div>热榜</div>
+        <div
+          class="tab"
+          :class="{ active: orderType === 0 }"
+          @click="orderType = 0"
+        >
+          热榜
+        </div>
         <el-divider direction="vertical"></el-divider>
-        <div>发布时间</div>
+        <div
+          class="tab"
+          :class="{ active: orderType === 1 }"
+          @click="orderType = 1"
+        >
+          发布时间
+        </div>
         <el-divider direction="vertical"></el-divider>
-        <div>最新</div>
+        <div
+          class="tab"
+          :class="{ active: orderType === 2 }"
+          @click="orderType = 2"
+        >
+          最新
+        </div>
       </div>
     </div>
     <div class="article-list">
@@ -27,12 +45,19 @@
 </template>
 
 <script setup>
-import { getCurrentInstance, ref, onMounted } from "vue";
+import { getCurrentInstance, ref, onMounted, watch } from "vue";
 import ArticleListItem from "@/views/forum/ArticleListItem.vue";
 const { proxy } = getCurrentInstance();
 const api = {
   loadArticle: "/forum/loadArticle",
 };
+const orderType = ref(0);
+watch(
+  () => orderType.value,
+  () => {
+    loadArticle();
+  }
+);
 
 const articleListInfo = ref({});
 const loading = ref(null);
@@ -43,6 +68,7 @@ const loadArticle = async (pageNo) => {
   let params = {
     pageNo: pageNo,
     boardId: 0,
+    orderType: orderType.value,
   };
   const result = await proxy.Request({
     url: api.loadArticle,
@@ -68,6 +94,14 @@ onMounted(() => {
     padding: 15px;
     font-size: 15px;
     border-bottom: 1px solid #ddd;
+    .tab {
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .active {
+      color: #5197ff;
+    }
   }
 }
 .article-list {
