@@ -16,6 +16,9 @@ import "normalize.css";
 //全局组件
 import Dialog from "@/components/Dialog.vue";
 import Avatar from "@/components/Avatar.vue";
+import Cover from "@/components/Cover.vue";
+import Pagination from "@/components/Pagination.vue";
+import NoData from "@/components/NoData.vue";
 // import Loading from "@/components/Loading.vue";
 //全局方法
 //表单校验
@@ -35,6 +38,9 @@ const userStore = useUserStore();
 import Request from "./utils/Request";
 app.component("Dialog", Dialog);
 app.component("Avatar", Avatar);
+app.component("Cover", Cover);
+app.component("Pagination", Pagination);
+app.component("NoData", NoData);
 app.use(router);
 app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;

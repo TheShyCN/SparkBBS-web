@@ -13,13 +13,15 @@
       </div>
     </div>
     <div class="article-list">
-      <ArticleListItem
-        v-for="(item, index) in articleListInfo"
-        :key="index"
-        :data="item"
+      <Pagination
+        :data-source="articleListInfo"
+        @loadData="loadArticle"
+        :loading="loading"
       >
-        <item class="title">{{ item.title }}</item>
-      </ArticleListItem>
+        <template #default="{ data }">
+          <ArticleListItem :data="data"></ArticleListItem>
+        </template>
+      </Pagination>
     </div>
   </div>
 </template>
@@ -33,16 +35,24 @@ const api = {
 };
 
 const articleListInfo = ref({});
+const loading = ref(null);
 
-const loadArticle = async () => {
+const loadArticle = async (pageNo) => {
+  // articleListInfo.value.pageNo = pageNo;
+  loading.value = true;
+  let params = {
+    pageNo: pageNo,
+    boardId: 0,
+  };
   const result = await proxy.Request({
     url: api.loadArticle,
-    params: {
-      boardId: 0,
-    },
+    params: params,
+    showLoading: false,
   });
+  loading.value = false;
   if (!result) return;
-  articleListInfo.value = result.data.list;
+  articleListInfo.value = result.data;
+  // articleListInfo.value.list = [];
 };
 onMounted(() => {
   loadArticle();
@@ -62,5 +72,6 @@ onMounted(() => {
 }
 .article-list {
   background-color: #fff;
+  padding-bottom: 20px;
 }
 </style>

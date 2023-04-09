@@ -47,7 +47,6 @@
 </template>
 
 <script setup>
-import Cover from "@/components/Cover.vue";
 const props = defineProps({
   data: {
     type: Object,

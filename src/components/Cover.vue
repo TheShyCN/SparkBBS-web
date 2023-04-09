@@ -3,11 +3,7 @@
     <el-image
       :style="{ width: size + 'px', height: size + 'px' }"
       fit="cover"
-      :src="
-        cover
-          ? proxy.globalInfo.imageUrl + cover
-          : 'src/assets/images/defaultImg.jpg'
-      "
+      :src="cover ? proxy.globalInfo.imageUrl + cover : localCover"
       loading="lazy"
     >
     </el-image>
@@ -17,6 +13,8 @@
 <script setup>
 import { getCurrentInstance } from "vue";
 const { proxy } = getCurrentInstance();
+const localCover = new URL("@/assets/images/defaultImg.jpg", import.meta.url)
+  .href;
 
 const props = defineProps({
   size: {
