@@ -11,9 +11,28 @@ const router = createRouter({
       // component: () => import("@/views/Layout.vue"),
       children: [
         {
+          // 所有文章
           path: "/",
           name: "articleList",
           component: () => import("@/views/forum/ArticleList.vue"),
+        },
+        {
+          // 一级版块
+          path: "/forum/:pBoardId",
+          name: "pBoardId",
+          component: () => import("@/views/forum/ArticleList.vue"),
+        },
+        {
+          // 二级版块
+          path: "/forum/:pBoardId/:boardId",
+          name: "boardId",
+          component: () => import("@/views/forum/ArticleList.vue"),
+        },
+        {
+          //用户信息
+          path: "/user/:userId",
+          name: "userCenter",
+          component: () => import("@/views/userCenter/UserCenter.vue"),
         },
       ],
     },

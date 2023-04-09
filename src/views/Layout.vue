@@ -12,10 +12,16 @@
       <!-- 版块信息 -->
       <div class="menu-panel">
         <div>
-          <div>
-            <span class="menu-item">全部</span>
+          <div :class="{ active: boardStore.$state.activePBoardId == 0 }">
+            <router-link class="menu-item" to="/">首页</router-link>
           </div>
-          <div v-for="(item, index) in boardList" :key="index">
+          <div
+            v-for="(item, index) in boardList"
+            :key="index"
+            :class="{
+              active: boardStore.$state.activePBoardId == item.boardId,
+            }"
+          >
             <el-popover
               placement="bottom-start"
               :width="200"
@@ -23,19 +29,27 @@
               v-if="item.children.length > 0"
             >
               <template #reference>
-                <span class="menu-item">{{ item.boardName }}</span>
+                <span class="menu-item" @click="boardClickHandler(item)">{{
+                  item.boardName
+                }}</span>
               </template>
               <div class="sub-board-list">
                 <span
                   class="sub-board"
+                  :class="{
+                    active: subItem.boardId == boardStore.$state.activeBoardId,
+                  }"
                   v-for="(subItem, index) in item.children"
                   :key="index"
+                  @click="subBoardClickHandler(subItem)"
                 >
                   {{ subItem.boardName }}
                 </span>
               </div>
             </el-popover>
-            <span v-else class="menu-item">{{ item.boardName }}</span>
+            <span v-else class="menu-item" @click="boardClickHandler(item)">{{
+              item.boardName
+            }}</span>
           </div>
         </div>
       </div>
@@ -103,9 +117,11 @@ import { ref, getCurrentInstance, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import LoginAndRegister from "@/views/LoginAndRegister.vue";
 import { useUserStore } from "@/store/user";
+import { useBoardStore } from "@/store/board";
 import { storeToRefs } from "pinia";
 
 const userStore = useUserStore();
+const boardStore = useBoardStore();
 //全局变量
 const { proxy } = getCurrentInstance();
 const router = useRouter();
@@ -116,7 +132,13 @@ const api = {
   getUserInfo: "/getUserInfo",
   loadBoard: "/board/loadBoard",
 };
-
+//点击版块路由跳转
+const boardClickHandler = (board) => {
+  router.push(`/forum/${board.boardId}`);
+};
+const subBoardClickHandler = (subBoard) => {
+  router.push(`/forum/${subBoard.pBoardId}/${subBoard.boardId}`);
+};
 // logo文字
 const logoInfo = ref([
   {
@@ -226,6 +248,7 @@ const loadBoard = async () => {
   });
   if (!result) return;
   boardList.value = result.data;
+  boardStore.saveBoardList(result.data);
 };
 </script>
 
@@ -273,6 +296,7 @@ const loadBoard = async () => {
           cursor: pointer;
           z-index: 2;
           transition: color 0.5s;
+          text-decoration: none;
         }
         .menu-item::after {
           content: "";
@@ -377,5 +401,15 @@ const loadBoard = async () => {
 }
 .body-content {
   margin-top: 60px;
+}
+.active {
+  background-color: #409eff !important;
+  color: #fff !important;
+  .menu-item {
+    color: #fff !important;
+  }
+  .menu-item:hover::after {
+    opacity: 0 !important;
+  }
 }
 </style>

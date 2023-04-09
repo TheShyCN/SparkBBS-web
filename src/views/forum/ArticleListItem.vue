@@ -3,7 +3,7 @@
     <div class="article-item-inner">
       <div class="article-body">
         <div class="user-info">
-          <Avatar :userId="data.userId" size="30"></Avatar>
+          <Avatar :userId="data.userId" :size="30"></Avatar>
           <router-link :to="`/user/${data.userId}`" class="a-link">
             {{ data.nickName }}
           </router-link>
