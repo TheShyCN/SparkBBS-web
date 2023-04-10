@@ -4,9 +4,27 @@
     :style="{
       width: size + 'px',
       height: size + 'px',
-      borderRadius: size / 2 + 'px',
+      borderRadius: '50%',
     }"
   >
+    <div
+      class="circle-1"
+      v-if="showCircle"
+      :style="{
+        width: size + 8 + 'px',
+        height: size + 8 + 'px',
+        borderRadius: '50%',
+      }"
+    ></div>
+    <div
+      class="circle-2"
+      v-if="showCircle"
+      :style="{
+        width: size + 16 + 'px',
+        height: size + 16 + 'px',
+        borderRadius: '50%',
+      }"
+    ></div>
     <el-image
       v-if="userId"
       :style="{
@@ -40,13 +58,47 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showCircle: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const goToUserCenter = () => {
   if (props.addLink) {
-    router.push("/user/" + proxy.userId);
+    router.push("/user/" + props.userId);
   }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.avatar {
+  position: relative;
+}
+.avatar:hover {
+  .circle-1 {
+    transform: rotate(360deg);
+  }
+  .circle-2 {
+    transform: rotate(-360deg);
+  }
+}
+.circle-1,
+.circle-2 {
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 1px;
+  transition: all ease-in-out 1.5s;
+  position: absolute;
+}
+.circle-1 {
+  border-color: rgb(40, 43, 53) rgb(40, 43, 53) rgb(40, 43, 53) transparent;
+  top: -4px;
+  left: -4px;
+}
+.circle-2 {
+  border-color: rgb(40, 43, 53) transparent rgb(40, 43, 53) rgb(40, 43, 53);
+  top: -8px;
+  left: -8px;
+}
+</style>
