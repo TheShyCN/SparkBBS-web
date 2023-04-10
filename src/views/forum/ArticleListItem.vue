@@ -25,7 +25,7 @@
             </router-link>
           </template>
         </div>
-        <router-link :to="'/'" class="a-link title">
+        <router-link :to="`/post/${data.articleId}`" class="a-link title">
           <span v-if="data.topType == 1" class="top">置顶</span>
           <span>{{ data.title }}</span>
         </router-link>
@@ -45,7 +45,9 @@
       <!-- <div class="cover" v-if="data.cover">
         <img :src="`/api/file/getImage/${data.cover}`" alt="" />
       </div> -->
-      <Cover :size="100" :cover="data.cover"></Cover>
+      <router-link :to="`/post/${data.articleId}`">
+        <Cover :size="100" :cover="data.cover"></Cover>
+      </router-link>
     </div>
   </div>
 </template>
