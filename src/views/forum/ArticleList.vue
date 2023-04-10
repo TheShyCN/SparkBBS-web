@@ -143,7 +143,7 @@ const loadArticle = async (pageNo) => {
   // articleListInfo.value.list = [];
 };
 onMounted(() => {
-  loadArticle();
+  // loadArticle();
 });
 </script>
 
@@ -174,13 +174,13 @@ onMounted(() => {
   display: flex;
   padding: 10px 0;
   .board-item {
+    padding: 4px 15px;
     background: #fff;
     border-radius: 15px;
-    padding: 2px 10px;
     margin-right: 10px;
     color: #909090;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     .a-link {
       color: #909090;
     }

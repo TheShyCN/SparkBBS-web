@@ -12,19 +12,23 @@
             {{ data.postTime }} · {{ data.userIpAddress }}
           </div>
           <el-divider direction="vertical"></el-divider>
-          <router-link :to="'/'" class="a-link">
+          <router-link :to="`/forum/${data.pBoardId}`" class="a-link">
             {{ data.pBoardName }}
           </router-link>
           <template v-if="data.boardName">
             <el-divider direction="vertical"></el-divider>
-            <router-link :to="'/'" class="a-link">
+            <router-link
+              :to="`/forum/${data.pBoardId}/${data.boardId}`"
+              class="a-link"
+            >
               {{ data.boardName }}
             </router-link>
           </template>
         </div>
-        <router-link :to="'/'" class="a-link title">{{
-          data.title
-        }}</router-link>
+        <router-link :to="'/'" class="a-link title">
+          <span v-if="data.topType == 1" class="top">置顶</span>
+          <span>{{ data.title }}</span>
+        </router-link>
         <div class="summary">{{ data.summary }}</div>
         <div class="article-info">
           <span class="iconfont icon-eye-solid">
@@ -83,6 +87,18 @@ const props = defineProps({
         color: black;
         font-size: 18px;
         font-weight: bold;
+        display: flex;
+        align-items: center;
+        .top {
+          color: var(--pink);
+          border: 1px solid var(--pink);
+          font-size: 12px;
+          border-radius: 3px;
+          padding: 0 5px;
+          margin-right: 5px;
+          height: 20px;
+          line-height: 20px;
+        }
       }
       .title:hover {
         color: var(--link);
