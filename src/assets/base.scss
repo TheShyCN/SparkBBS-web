@@ -48,3 +48,14 @@
 body {
   background-color: #f3f3f3;
 }
+
+// 文章详情v-html中的样式
+.detail {
+  img {
+    max-width: 90%;
+  }
+  a {
+    color: var(--link);
+    text-decoration: none;
+  }
+}

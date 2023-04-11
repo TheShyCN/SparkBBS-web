@@ -44,7 +44,25 @@
             </div>
           </div>
         </div>
+        <!-- 文章详情 -->
         <div class="detail" id="detail" v-html="articleInfo.content"></div>
+      </div>
+      <!-- 附件 -->
+      <div class="attachment-panel" id="view-attachment" v-if="attachment">
+        <div class="title">附件</div>
+        <div class="attachment-info">
+          <div class="iconfont icon-zip"></div>
+          <div class="file-name">{{ attachment.fileName }}</div>
+          <div class="size">{{ Utils.sizeToStr(attachment.fileSize) }}</div>
+          <div>
+            需要<span class="integral">{{ attachment.integral }}</span
+            >积分
+          </div>
+          <div class="download-count">已下载{{ attachment.downloadCount }}</div>
+          <div class="download-btn">
+            <el-button type="primary" size="small">下载</el-button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -53,6 +71,7 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance, computed } from "vue";
 import { useRoute } from "vue-router";
+import Utils from "@/utils/Utils.js";
 
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -61,6 +80,8 @@ const api = {
 };
 //文章详情
 const articleInfo = ref(null);
+//附件
+const attachment = ref(null);
 
 //二级id
 // const boardId = computed(() =>
@@ -77,6 +98,7 @@ const getArticleDetail = async () => {
   });
   if (!result) return;
   articleInfo.value = result.data.forumArticle;
+  attachment.value = result.data.attachment;
 };
 
 onMounted(() => {
@@ -102,6 +124,34 @@ onMounted(() => {
     }
     .user-info {
       margin-top: 20px;
+    }
+  }
+  .attachment-panel {
+    background-color: #fff;
+    margin-top: 20px;
+    padding: 15px;
+    .title {
+      font-size: 18px;
+    }
+    .attachment-info {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      color: #9f9f9f;
+      div {
+        margin-right: 10px;
+      }
+      .icon-zip {
+        font-size: 20px;
+        color: #6ca1f7;
+      }
+      .file-name {
+        color: #6ca1f7;
+      }
+      .integral {
+        color: var(--pink);
+        padding: 0 8px;
+      }
     }
   }
   .user-info {
