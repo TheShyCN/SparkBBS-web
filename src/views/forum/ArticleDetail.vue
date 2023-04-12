@@ -64,24 +64,65 @@
           </div>
         </div>
       </div>
+      <!-- 评论 -->
+      <div class="comment-panel" id="view-comment"></div>
+    </div>
+  </div>
+  <!-- 左侧快捷操作 -->
+  <div
+    class="quick-panel"
+    :style="{ left: quickPanelLeft + 'px' }"
+    v-if="quickPanelLeft"
+  >
+    <el-badge
+      :value="articleInfo?.goodCount"
+      type="info"
+      :hide="articleInfo?.goodCount"
+    >
+      <div
+        class="quick-item"
+        :class="{ 'have-like': haveLike }"
+        @click="doLikeHandler"
+      >
+        <span class="iconfont icon-good"></span>
+      </div>
+    </el-badge>
+    <el-badge
+      :value="articleInfo?.commentCount"
+      type="info"
+      :hide="articleInfo?.commentCount"
+    >
+      <div class="quick-item" @click="goToPosition('view-comment')">
+        <span class="iconfont icon-comment"></span>
+      </div>
+    </el-badge>
+    <div class="quick-item" @click="goToPosition('view-attachment')">
+      <span class="iconfont icon-attachment"></span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, getCurrentInstance, computed } from "vue";
+import { ref, onMounted, getCurrentInstance, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import Utils from "@/utils/Utils.js";
+import { useUserStore } from "@/store/user";
+
+const userStore = useUserStore();
 
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const api = {
   getArticleDetail: "/forum/getArticleDetail",
+  // 点赞
+  doLike: "/forum/doLike",
 };
 //文章详情
 const articleInfo = ref(null);
 //附件
 const attachment = ref(null);
+// 是否点赞
+const haveLike = ref(false);
 
 //二级id
 // const boardId = computed(() =>
@@ -99,11 +140,49 @@ const getArticleDetail = async () => {
   if (!result) return;
   articleInfo.value = result.data.forumArticle;
   attachment.value = result.data.attachment;
+  haveLike.value = result.data.haveLike;
 };
 
 onMounted(() => {
   getArticleDetail();
+  window.addEventListener("resize", listenResize);
 });
+
+onUnmounted(() => {
+  window.removeEventListener("resize", listenResize);
+});
+
+//快捷操作的偏移量
+const quickPanelLeft = ref(
+  (window.innerWidth - proxy.globalInfo.bodyWidth) / 2 - 110
+);
+//改变窗口大小触发回调
+const listenResize = () => {
+  quickPanelLeft.value =
+    (window.innerWidth - proxy.globalInfo.bodyWidth) / 2 - 110;
+};
+
+const goToPosition = (domId) => {
+  document.querySelector(`#${domId}`).scrollIntoView();
+};
+
+//点赞
+const doLikeHandler = async () => {
+  if (!userStore.getLoginUserInfo) {
+    userStore.updateShowLogin(true);
+    return;
+  }
+  const result = await proxy.Request({
+    url: api.doLike,
+    params: {
+      articleId: articleInfo.value.articleId,
+    },
+  });
+  if (!result) return;
+  haveLike.value = !haveLike.value;
+  let goodCount = haveLike.value ? 1 : -1;
+  articleInfo.value.goodCount += goodCount;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -154,6 +233,11 @@ onMounted(() => {
       }
     }
   }
+  .comment-panel {
+    background-color: #fff;
+    height: 200px;
+    margin-top: 20px;
+  }
   .user-info {
     display: flex;
     align-items: end;
@@ -193,6 +277,34 @@ onMounted(() => {
     line-height: 30px;
     letter-spacing: 1px;
     overflow: hidden;
+  }
+}
+.quick-panel {
+  position: fixed;
+  top: 200px;
+  display: flex;
+  flex-direction: column;
+
+  .quick-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    background: #fff;
+    margin-bottom: 30px;
+    span {
+      color: var(--text2);
+      font-size: 20px;
+    }
+  }
+  .have-like {
+    background-color: var(--link);
+    span {
+      color: #fff;
+    }
   }
 }
 </style>

@@ -6,7 +6,7 @@
       :buttons="dialogConfig.buttons"
       width="400px"
       :showCancel="false"
-      @close="dialogConfig.show = false"
+      @close="closeDialog"
     >
       <el-form
         class="login-register"
@@ -274,6 +274,11 @@ const api = {
   register: "/register",
   login: "/login",
   restPwd: "/resetPwd",
+};
+// 关闭登录框
+const closeDialog = () => {
+  dialogConfig.show = false;
+  userStore.updateShowLogin(false);
 };
 
 //注册:0 登录:1 重置密码:2

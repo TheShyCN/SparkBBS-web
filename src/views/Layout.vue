@@ -260,7 +260,7 @@ const loadBoard = async () => {
   height: 60px;
   box-shadow: 0 2px 6px 0 #ddd;
   position: fixed;
-  z-index: 1;
+  z-index: 2;
   .header-content {
     height: 60px;
 
