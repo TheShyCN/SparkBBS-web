@@ -25,6 +25,8 @@ import NoData from "@/components/NoData.vue";
 import Verify from "./utils/Verify";
 //提示信息
 import Message from "./utils/Message";
+// 弹出框
+import Confirm from "./utils/Confirm";
 
 //引入状态管理工具--pinia
 import { createPinia } from "pinia";
@@ -54,5 +56,6 @@ app.config.globalProperties.globalInfo = {
 app.config.globalProperties.Verify = Verify;
 app.config.globalProperties.Message = Message;
 app.config.globalProperties.Request = Request;
+app.config.globalProperties.Confirm = Confirm;
 
 app.mount("#app");

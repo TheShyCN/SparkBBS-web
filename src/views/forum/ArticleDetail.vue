@@ -60,7 +60,12 @@
           </div>
           <div class="download-count">已下载{{ attachment.downloadCount }}</div>
           <div class="download-btn">
-            <el-button type="primary" size="small">下载</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="attachmentDownloadHandler"
+              >下载</el-button
+            >
           </div>
         </div>
       </div>
@@ -74,6 +79,7 @@
     :style="{ left: quickPanelLeft + 'px' }"
     v-if="quickPanelLeft"
   >
+    <!-- 点赞 -->
     <el-badge
       :value="articleInfo?.goodCount"
       type="info"
@@ -87,6 +93,7 @@
         <span class="iconfont icon-good"></span>
       </div>
     </el-badge>
+    <!-- 评论 -->
     <el-badge
       :value="articleInfo?.commentCount"
       type="info"
@@ -96,6 +103,7 @@
         <span class="iconfont icon-comment"></span>
       </div>
     </el-badge>
+    <!-- 附件 -->
     <div class="quick-item" @click="goToPosition('view-attachment')">
       <span class="iconfont icon-attachment"></span>
     </div>
@@ -116,6 +124,10 @@ const api = {
   getArticleDetail: "/forum/getArticleDetail",
   // 点赞
   doLike: "/forum/doLike",
+  //下载附件
+  attachmentDownload: "/forum/attachmentDownload",
+  // 获取用户下载信息
+  getUserDownloadInfo: "/forum/getUserDownloadInfo",
 };
 //文章详情
 const articleInfo = ref(null);
@@ -182,6 +194,52 @@ const doLikeHandler = async () => {
   haveLike.value = !haveLike.value;
   let goodCount = haveLike.value ? 1 : -1;
   articleInfo.value.goodCount += goodCount;
+};
+
+// 下载附件的回调
+const downloadFile = () => {
+  document.location.href = `/api${api.attachmentDownload}?fileId=${attachment.value.fileId}`;
+  attachment.value.downloadCount += 1;
+};
+
+//下载附件
+const attachmentDownloadHandler = async () => {
+  const currentUserId = userStore.loginUserInfo.userId;
+  if (!currentUserId) {
+    updateShowLogin(true);
+    return;
+  }
+  // 0积分或当前用户为作者,直接下载
+  if (
+    attachment.value.integral === 0 ||
+    currentUserId !== articleInfo.value.userId
+  ) {
+    downloadFile();
+    return;
+  }
+
+  //获取用户积分
+  const result = await proxy.Request({
+    url: api.getUserDownloadInfo,
+    params: {
+      fileId: attachment.value.fileId,
+    },
+  });
+  if (!result) return;
+  const { userIntegral, haveDownLoad } = result.data;
+  // 重复下载;
+  if (haveDownLoad) {
+    downloadFile();
+    return;
+  }
+  if (userIntegral < attachment.value.integral) {
+    proxy.Message.warning("你的积分不足,无法下载!");
+    return;
+  }
+  proxy.Confirm(
+    `你还有${userIntegral}积分, 当前下载会扣除${attachment.value.integral}积分, 确定要下载么?`,
+    downloadFile
+  );
 };
 </script>
 
