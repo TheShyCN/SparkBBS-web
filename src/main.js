@@ -19,6 +19,7 @@ import Avatar from "@/components/Avatar.vue";
 import Cover from "@/components/Cover.vue";
 import Pagination from "@/components/Pagination.vue";
 import NoData from "@/components/NoData.vue";
+import ImageViewer from "./components/ImageViewer.vue";
 // import Loading from "@/components/Loading.vue";
 //全局方法
 //表单校验
@@ -43,6 +44,7 @@ app.component("Avatar", Avatar);
 app.component("Cover", Cover);
 app.component("Pagination", Pagination);
 app.component("NoData", NoData);
+app.component("ImageViewer", ImageViewer);
 app.use(router);
 app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;

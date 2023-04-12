@@ -107,16 +107,25 @@
     <div class="quick-item" @click="goToPosition('view-attachment')">
       <span class="iconfont icon-attachment"></span>
     </div>
+    <ImageViewer
+      ref="ImageViewerRef"
+      :imageList="previewImageList"
+    ></ImageViewer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, getCurrentInstance, onUnmounted } from "vue";
+import { ref, onMounted, getCurrentInstance, onUnmounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import Utils from "@/utils/Utils.js";
 import { useUserStore } from "@/store/user";
+import { useBoardStore } from "@/store/board";
+// 代码高亮
+import hljs from "highlight.js";
+import "highlight.js/styles/atom-one-light.css";
 
 const userStore = useUserStore();
+const boardStore = useBoardStore();
 
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -140,7 +149,7 @@ const haveLike = ref(false);
 // const boardId = computed(() =>
 //   articleInfo.boardId ? "/" + articleInfo.boardId : ""
 // );
-
+//获取文章详情
 const getArticleDetail = async () => {
   let params = {
     articleId: route.params.articleId,
@@ -153,6 +162,10 @@ const getArticleDetail = async () => {
   articleInfo.value = result.data.forumArticle;
   attachment.value = result.data.attachment;
   haveLike.value = result.data.haveLike;
+  boardStore.activePBoardId = result.data.forumArticle.pBoardId;
+  boardStore.activeBoardId = result.data.forumArticle.boardId;
+  imagePreview();
+  highlightCode();
 };
 
 onMounted(() => {
@@ -240,6 +253,31 @@ const attachmentDownloadHandler = async () => {
     `你还有${userIntegral}积分, 当前下载会扣除${attachment.value.integral}积分, 确定要下载么?`,
     downloadFile
   );
+};
+
+//图片预览
+const previewImageList = ref(null);
+const ImageViewerRef = ref(null);
+const imagePreview = () => {
+  nextTick(() => {
+    const imageListNode = document.querySelectorAll("#detail img");
+    const imageList = [];
+    imageListNode.forEach((item, index) => {
+      imageList.push(item.getAttribute("src"));
+      item.addEventListener("click", () => {
+        ImageViewerRef.value.show(index);
+      });
+    });
+    previewImageList.value = imageList;
+  });
+};
+//代码高亮
+const highlightCode = () => {
+  nextTick(() => {
+    document.querySelectorAll("pre code").forEach((item) => {
+      hljs.highlightBlock(item);
+    });
+  });
 };
 </script>
 

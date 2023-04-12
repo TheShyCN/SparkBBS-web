@@ -193,7 +193,7 @@ const initScroll = () => {
     const currentScrollTop = getScrollTop();
     scrollType = currentScrollTop > initScrollTop ? 1 : 0;
     // 向下滑动超过100
-    if (scrollType === 1 && currentScrollTop > 300) {
+    if (scrollType === 1 && currentScrollTop > 100) {
       showHeader.value = false;
     } else {
       showHeader.value = true;
