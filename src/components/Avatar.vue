@@ -30,13 +30,24 @@
       :style="{
         width: size + 'px',
         height: size + 'px',
-        borderRadius: size / 2 + 'px',
+        borderRadius: '50%',
       }"
       :src="proxy.globalInfo.avatarUrl + userId"
       fit="scale-down"
       loading="lazy"
       @click="goToUserCenter"
     />
+    <div
+      class="no-user"
+      v-else
+      :style="{
+        width: size + 'px',
+        height: size + 'px',
+        borderRadius: '50%',
+      }"
+    >
+      <span>未登录</span>
+    </div>
   </div>
 </template>
 
@@ -75,6 +86,16 @@ const goToUserCenter = () => {
 .avatar {
   position: relative;
 }
+.no-user {
+  background-color: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  span {
+    font-size: 13px;
+  }
+}
+
 .avatar:hover {
   .circle-1 {
     transform: rotate(360deg);

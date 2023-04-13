@@ -50,15 +50,15 @@
       </div>
     </div>
     <div class="article-list">
-      <Pagination
+      <DataList
         :data-source="articleListInfo"
         @loadData="loadArticle"
         :loading="loading"
       >
-        <template #default="{ data }">
-          <ArticleListItem :data="data"></ArticleListItem>
+        <template #default="{ dataItem }">
+          <ArticleListItem :data="dataItem"></ArticleListItem>
         </template>
-      </Pagination>
+      </DataList>
     </div>
   </div>
 </template>

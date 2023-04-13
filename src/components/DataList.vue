@@ -7,12 +7,11 @@
   </div>
 
   <div v-for="item in dataSource.list" v-else>
-    <slot :data="item"></slot>
+    <slot :dataItem="item"></slot>
   </div>
 
-  <div class="pagination">
+  <div class="pagination" v-if="dataSource.pageTotal > 1">
     <el-pagination
-      v-if="dataSource.pageTotal > 1"
       background
       :total="dataSource.totalCount"
       layout="prev, pager, next"

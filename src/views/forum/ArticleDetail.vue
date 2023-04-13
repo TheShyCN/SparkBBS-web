@@ -4,6 +4,7 @@
     :style="{ width: proxy.globalInfo.bodyWidth + 'px' }"
     v-if="articleInfo"
   >
+    <!-- 导航 -->
     <div class="board-info">
       <router-link :to="`/forum/${articleInfo.pBoardId}`" class="a-link">
         {{ articleInfo.pBoardName }}
@@ -70,7 +71,12 @@
         </div>
       </div>
       <!-- 评论 -->
-      <div class="comment-panel" id="view-comment"></div>
+      <div class="comment-panel" id="view-comment">
+        <CommentList
+          :article-id="articleInfo.articleId"
+          :article-user-id="articleInfo.userId"
+        ></CommentList>
+      </div>
     </div>
   </div>
   <!-- 左侧快捷操作 -->
@@ -120,6 +126,7 @@ import { useRoute } from "vue-router";
 import Utils from "@/utils/Utils.js";
 import { useUserStore } from "@/store/user";
 import { useBoardStore } from "@/store/board";
+import CommentList from "@/views/forum/CommentList.vue";
 // 代码高亮
 import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-light.css";
@@ -331,8 +338,8 @@ const highlightCode = () => {
   }
   .comment-panel {
     background-color: #fff;
-    height: 200px;
     margin-top: 20px;
+    padding: 25px 20px;
   }
   .user-info {
     display: flex;
