@@ -9,41 +9,16 @@
       </div>
     </div>
     <div class="comment-form-panel">
-      <Avatar :size="50" :userId="currentUserId"></Avatar>
-      <div class="comment-form">
-        <el-form
-          :model="formData"
-          :rules="rules"
-          ref="formDataRef"
-          label-width="20px"
-          @submit.prevent
-        >
-          <el-form-item prop="content">
-            <el-input
-              clearable
-              placeholder="请文明发言!"
-              type="textarea"
-              :rows="3"
-              :maxlength="800"
-              resize="none"
-              show-word-limit
-              v-model.trim="formData.content"
-            ></el-input>
-            <div class="insert-img">
-              <el-upload
-                name="file"
-                :show-file-list="false"
-                accept=".png,.PNG,.jpg,.JPG,.jpeg,.JPEG,.gif,.GIF,.bmp,.BMP"
-                :multiple="false"
-                :http-request="selectImg"
-              >
-                <span class="iconfont icon-image"></span>
-              </el-upload>
-            </div>
-          </el-form-item>
-        </el-form>
-      </div>
-      <el-button type="primary" class="submit">发表</el-button>
+      <PostComment
+        :pCommentId="0"
+        :article-id="articleId"
+        :user-id="currentUserId"
+        :avatar-size="50"
+        :reply-user-id="articleUserId"
+        :show-insert-img="currentUserId !== null"
+        :placeholder-info="'请文明发言! 做一个互联网新时代好青年!'"
+        @post-comment-finish="postCommentFish"
+      ></PostComment>
     </div>
     <div class="comment-list">
       <DataList
@@ -52,7 +27,13 @@
         :loading="loading"
       >
         <template #default="{ dataItem }">
-          <CommentListItem :data="dataItem"></CommentListItem>
+          <CommentListItem
+            :article-id="articleId"
+            :data="dataItem"
+            :article-user-id="articleUserId"
+            :current-user-id="currentUserId"
+            @hideAllReply="handlerHideAllReply"
+          ></CommentListItem>
         </template>
       </DataList>
     </div>
@@ -60,18 +41,14 @@
 </template>
 
 <script setup>
+import PostComment from "./PostComment.vue";
 import { watch, ref, getCurrentInstance, onMounted } from "vue";
 import { useUserStore } from "@/store/user";
 import CommentListItem from "@/components/CommentListItem.vue";
 const userStore = useUserStore();
 const { proxy } = getCurrentInstance();
 const currentUserId = ref(null);
-//文本框表单
-const formData = ref({});
-const formDataRef = ref();
-const rules = {
-  content: [{ required: true, message: "请输入评论内容!" }],
-};
+
 //排序方式
 const orderType = ref(0);
 //评论
@@ -104,8 +81,6 @@ const props = defineProps({
   },
 });
 
-const selectImg = () => {};
-
 const loading = ref(null);
 
 const loadComment = async (pageNo) => {
@@ -126,6 +101,15 @@ const loadComment = async (pageNo) => {
 onMounted(() => {
   loadComment();
 });
+
+const handlerHideAllReply = () => {
+  commentListInfo.value.list.forEach((item) => {
+    item.showReplyInfo = false;
+  });
+};
+const postCommentFish = (comment) => {
+  commentListInfo.value.list.unshift(comment);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -156,21 +140,6 @@ onMounted(() => {
 .comment-form-panel {
   margin-top: 30px;
   margin-left: 30px;
-  display: flex;
-  .avatar {
-    margin-top: 15px;
-  }
-  .comment-form {
-    flex: 1;
-    margin-right: 20px;
-    .icon-image {
-      font-size: 20px;
-    }
-  }
-  .submit {
-    margin-top: 15px;
-    font-size: 18px;
-    height: 50px;
-  }
+  margin-bottom: 30px;
 }
 </style>

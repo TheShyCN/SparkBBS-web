@@ -96,6 +96,9 @@ const goToUserCenter = () => {
   }
 }
 
+.avatar {
+  box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.3);
+}
 .avatar:hover {
   .circle-1 {
     transform: rotate(360deg);
@@ -113,12 +116,12 @@ const goToUserCenter = () => {
   position: absolute;
 }
 .circle-1 {
-  border-color: rgb(40, 43, 53) rgb(40, 43, 53) rgb(40, 43, 53) transparent;
+  border-color: var(--link) var(--link) var(--link) transparent;
   top: -4px;
   left: -4px;
 }
 .circle-2 {
-  border-color: rgb(40, 43, 53) transparent rgb(40, 43, 53) rgb(40, 43, 53);
+  border-color: var(--link) transparent var(--link) var(--link);
   top: -8px;
   left: -8px;
 }
