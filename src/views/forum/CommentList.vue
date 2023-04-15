@@ -1,11 +1,17 @@
 <template>
   <div class="comment-body">
     <div class="comment-title">
-      <div class="title">评论<span class="count">0</span></div>
+      <div class="title">
+        评论<span class="count">{{ commentListInfo.totalCount }}</span>
+      </div>
       <div class="tab">
-        <span :class="{ active: true }">热榜</span>
+        <span :class="{ active: orderType === 0 }" @click="orderTypeChange(0)"
+          >热榜</span
+        >
         <el-divider direction="vertical"></el-divider>
-        <span :class="{ active: false }">最新</span>
+        <span :class="{ active: orderType === 1 }" @click="orderTypeChange(1)"
+          >最新</span
+        >
       </div>
     </div>
     <div class="comment-form-panel">
@@ -51,6 +57,11 @@ const currentUserId = ref(null);
 
 //排序方式
 const orderType = ref(0);
+
+const orderTypeChange = (type) => {
+  orderType.value = type;
+  loadComment();
+};
 //评论
 const commentListInfo = ref({});
 const api = {
@@ -93,6 +104,7 @@ const loadComment = async (pageNo) => {
       articleId: props.articleId,
       orderType: orderType.value,
     },
+    showLoading: false,
   });
   loading.value = false;
   if (!result) return;
@@ -107,8 +119,12 @@ const handlerHideAllReply = () => {
     item.showReplyInfo = false;
   });
 };
+
+const emit = defineEmits(["updateCommentCount"]);
 const postCommentFish = (comment) => {
   commentListInfo.value.list.unshift(comment);
+  commentListInfo.value.totalCount += 1;
+  emit("updateCommentCount");
 };
 </script>
 
@@ -131,6 +147,7 @@ const postCommentFish = (comment) => {
     align-items: center;
     span {
       font-size: 20px;
+      cursor: pointer;
     }
     .active {
       color: var(--link);

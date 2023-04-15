@@ -75,6 +75,7 @@
         <CommentList
           :article-id="articleInfo.articleId"
           :article-user-id="articleInfo.userId"
+          @updateCommentCount="updateCommentCount"
         ></CommentList>
       </div>
     </div>
@@ -285,6 +286,11 @@ const highlightCode = () => {
       hljs.highlightBlock(item);
     });
   });
+};
+
+//更新侧边栏评论数量
+const updateCommentCount = () => {
+  articleInfo.value.commentCount += 1;
 };
 </script>
 
