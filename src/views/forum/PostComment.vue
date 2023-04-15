@@ -21,7 +21,15 @@
             v-model.trim="formData.content"
           ></el-input>
           <div class="insert-img" v-if="showInsertImg">
+            <div class="pre-img" v-if="commentImg">
+              <CommentImage :src="commentImg"></CommentImage>
+              <span
+                class="iconfont icon-remove"
+                @click="removeCommentImg"
+              ></span>
+            </div>
             <el-upload
+              v-else
               name="file"
               :show-file-list="false"
               accept=".png,.PNG,.jpg,.JPG,.jpeg,.JPEG,.gif,.GIF,.bmp,.BMP"
@@ -43,6 +51,7 @@
 <script setup>
 import { ref, getCurrentInstance } from "vue";
 import { useUserStore } from "@/store/user";
+import CommentImage from "./CommentImage.vue";
 
 const userStore = useUserStore();
 const { proxy } = getCurrentInstance();
@@ -78,7 +87,23 @@ const props = defineProps({
     type: String,
   },
 });
-const selectImg = () => {};
+
+// 选择图片
+const commentImg = ref(null);
+const selectImg = ({ file }) => {
+  console.log(file);
+  let img = new FileReader();
+  img.readAsDataURL(file);
+  img.onload = ({ target }) => {
+    let imageData = target.result;
+    commentImg.value = imageData;
+    formData.value.image = file;
+  };
+};
+const removeCommentImg = () => {
+  commentImg.value = null;
+  formData.value.image = null;
+};
 // 发布评论
 const emit = defineEmits(["postCommentFinish"]);
 const postCommentDo = () => {
@@ -102,6 +127,7 @@ const postCommentDo = () => {
     formDataRef.value.resetFields();
     proxy.Message.success("评论发表成功!");
     emit("postCommentFinish", result.data);
+    removeCommentImg();
   });
 };
 </script>
@@ -123,6 +149,16 @@ const postCommentDo = () => {
     margin-top: 15px;
     font-size: 18px;
     height: 50px;
+  }
+}
+.pre-img {
+  position: relative;
+  margin-top: 10px;
+  .iconfont {
+    position: absolute;
+    top: -15px;
+    right: -10px;
+    cursor: pointer;
   }
 }
 </style>

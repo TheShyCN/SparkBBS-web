@@ -9,7 +9,16 @@
         >
       </div>
       <div class="comment-content">
-        <span v-html="data.content"></span>
+        <div v-html="data.content"></div>
+        <CommentImage
+          :style="{ marginTop: '10px' }"
+          v-if="data.imgPath"
+          :src="`${proxy.globalInfo.imageUrl}${data.imgPath.replace(
+            '.',
+            '_.'
+          )}`"
+          :image-list="[`${proxy.globalInfo.imageUrl}${data.imgPath}`]"
+        ></CommentImage>
       </div>
       <div class="info">
         <span class="time">{{ data.postTime }}</span>
@@ -83,6 +92,7 @@
 </template>
 
 <script setup>
+import CommentImage from "@/views/forum/CommentImage.vue";
 import PostComment from "@/views/forum/PostComment.vue";
 import { ref, getCurrentInstance } from "vue";
 const { proxy } = getCurrentInstance();
