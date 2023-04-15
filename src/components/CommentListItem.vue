@@ -14,7 +14,12 @@
       <div class="info">
         <span class="time">{{ data.postTime }}</span>
         <span class="ip">{{ data.userIpAddress }}</span>
-        <span class="iconfont icon-good">{{ data.goodCount }}</span>
+        <span
+          :class="{ active: data.likeType }"
+          class="iconfont icon-good"
+          @click="doLike(data)"
+          >{{ data.goodCount ? data.goodCount : "点赞" }}</span
+        >
         <span class="iconfont icon-comment" @click="showReply(data)">回复</span>
         <el-dropdown v-if="currentUserId === articleUserId">
           <div class="iconfont icon-more"></div>
@@ -27,15 +32,50 @@
           </template>
         </el-dropdown>
       </div>
+      <div class="comment-sub-list" v-if="data.children">
+        <div
+          class="comment-sub-item"
+          v-for="(sub, index) in data.children"
+          :key="index"
+        >
+          <Avatar :userId="sub.userId" :showCircle="false" :size="35"></Avatar>
+          <div class="comment-info">
+            <div>
+              <span class="nickName">{{ sub.nickName }}</span>
+              <span
+                >回复:&nbsp;
+                <router-link :to="`/user/${sub.replyUserId}`"
+                  >@{{ sub.replyNickName }}</router-link
+                >
+              </span>
+              <span v-html="sub.content"></span>
+            </div>
+            <div class="info">
+              <span class="time">{{ sub.postTime }}</span>
+              <span class="ip">{{ sub.userIpAddress }}</span>
+              <span
+                :class="{ active: sub.likeType }"
+                class="iconfont icon-good"
+                @click="doLike(sub)"
+                >{{ sub.goodCount ? sub.goodCount : "点赞" }}</span
+              >
+              <span class="iconfont icon-comment" @click="showReply(sub)"
+                >回复</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="reply-info" v-if="data.showReplyInfo">
         <PostComment
-          :avatarSize="40"
+          :avatarSize="50"
           :userId="currentUserId"
           :showInsertImg="false"
           :pCommentId="pCommentId"
           :replyUserId="replyUserId"
           :articleId="articleId"
           @post-comment-finish="postCommentFish"
+          :placeholder-info="placeholder"
         ></PostComment>
       </div>
     </div>
@@ -44,7 +84,23 @@
 
 <script setup>
 import PostComment from "@/views/forum/PostComment.vue";
-import { ref } from "vue";
+import { ref, getCurrentInstance } from "vue";
+const { proxy } = getCurrentInstance();
+const api = {
+  doLike: "/comment/doLike",
+};
+//点赞
+const doLike = async (commentData) => {
+  const result = await proxy.Request({
+    url: api.doLike,
+    params: {
+      commentId: commentData.commentId,
+    },
+  });
+  if (!result) return;
+  commentData.likeType = result.data.likeType;
+  commentData.goodCount = result.data.goodCount;
+};
 
 const props = defineProps({
   data: {
@@ -61,6 +117,7 @@ const props = defineProps({
   },
 });
 
+const placeholder = ref(null);
 const pCommentId = ref(0);
 const replyUserId = ref(null);
 
@@ -69,17 +126,19 @@ const emit = defineEmits(["hideAllReply"]);
 const showReply = (commentData) => {
   // 存储变化前的值
   const isShow =
-    commentData.showReplyInfo === undefined ? false : commentData.showReplyInfo;
+    props.data.showReplyInfo === undefined ? false : props.data.showReplyInfo;
   emit("hideAllReply");
-  commentData.showReplyInfo = !isShow;
-  pCommentId.value = commentData.commentId;
-  // articleId.value = commentData.articleId;
-  // replyUserId.value = commentData.userId;
+  props.data.showReplyInfo = !isShow;
+  pCommentId.value = props.data.commentId;
+  replyUserId.value = commentData.userId;
+  placeholder.value = `回复 @${commentData.nickName}`;
 };
 // 发表二级评论
-const propCommentData = ref(props.data);
 const postCommentFish = (commentData) => {
-  propCommentData.value.children.unshift(commentData);
+  props.data.children === null
+    ? (props.data.children = commentData)
+    : props.data.children.unshift(commentData[commentData.length - 1]);
+  props.data.showReplyInfo = false;
 };
 </script>
 
@@ -94,8 +153,6 @@ const postCommentFish = (commentData) => {
     display: flex;
     flex-direction: column;
     .nickName {
-      font-size: 14px;
-      cursor: pointer;
       color: var(--text2);
     }
     .tag-author {
@@ -106,17 +163,14 @@ const postCommentFish = (commentData) => {
       border-radius: 2px;
       background: var(--pink);
     }
-    .nickName:hover {
-      color: var(--link);
-    }
+
     .comment-content {
       margin-top: 10px;
-      margin-bottom: 10px;
       font-size: 18px;
     }
     .info {
-      padding-bottom: 20px;
       margin-top: 10px;
+      margin-bottom: 10px;
       font-size: 14px;
       color: var(--text2);
       .ip,
@@ -137,5 +191,27 @@ const postCommentFish = (commentData) => {
       }
     }
   }
+}
+.comment-sub-item {
+  display: flex;
+  margin-bottom: 10px;
+  .comment-info {
+    border-bottom: none;
+    margin-left: 10px;
+    div {
+      .nickName {
+        margin-right: 5px;
+      }
+      a {
+        text-decoration: none;
+        color: var(--link);
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+.active {
+  color: var(--link);
 }
 </style>

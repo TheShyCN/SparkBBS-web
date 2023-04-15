@@ -42,7 +42,9 @@
 
 <script setup>
 import { ref, getCurrentInstance } from "vue";
+import { useUserStore } from "@/store/user";
 
+const userStore = useUserStore();
 const { proxy } = getCurrentInstance();
 const api = {
   postComment: "/comment/postComment",
@@ -80,6 +82,10 @@ const selectImg = () => {};
 // 发布评论
 const emit = defineEmits(["postCommentFinish"]);
 const postCommentDo = () => {
+  if (!userStore.getLoginUserInfo) {
+    userStore.updateShowLogin(true);
+    return;
+  }
   formDataRef.value.validate(async (valid) => {
     if (!valid) {
       return;
@@ -88,7 +94,6 @@ const postCommentDo = () => {
     params.pCommentId = props.pCommentId;
     params.replyUserId = props.replyUserId;
     params.articleId = props.articleId;
-    console.log(params);
     const result = await proxy.Request({
       url: api.postComment,
       params,
