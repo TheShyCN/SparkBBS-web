@@ -62,7 +62,7 @@
       </div>
       <!-- 登录,发帖,注册 -->
       <div class="user-info-panel">
-        <el-button type="primary">
+        <el-button type="primary" @click="newPostClickHandler">
           发帖<span class="iconfont icon-add"></span>
         </el-button>
         <template v-if="userInfo.userId">
@@ -139,6 +139,15 @@ const boardClickHandler = (board) => {
 const subBoardClickHandler = (subBoard) => {
   router.push(`/forum/${subBoard.pBoardId}/${subBoard.boardId}`);
 };
+// 跳转发帖
+const newPostClickHandler = () => {
+  if (!userStore.loginUserInfo) {
+    userStore.updateShowLogin(true);
+    return;
+  }
+  router.push("/newPost");
+};
+
 // logo文字
 const logoInfo = ref([
   {

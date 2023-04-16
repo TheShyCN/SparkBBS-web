@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Layout from "../views/Layout.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,8 +6,7 @@ const router = createRouter({
     {
       path: "/",
       name: "layout",
-      component: Layout,
-      // component: () => import("@/views/Layout.vue"),
+      component: () => import("@/views/Layout.vue"),
       children: [
         {
           // 所有文章
@@ -33,6 +31,18 @@ const router = createRouter({
           path: "/post/:articleId",
           name: "articleDetail",
           component: () => import("@/views/forum/ArticleDetail.vue"),
+        },
+        {
+          //发布文章
+          path: "/newPost",
+          name: "newPost",
+          component: () => import("@/views/forum/EditPost.vue"),
+        },
+        {
+          //编辑文章
+          path: "/editPost/:articleId",
+          name: "editPost",
+          component: () => import("@/views/forum/EditPost.vue"),
         },
         {
           //用户信息

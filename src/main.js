@@ -20,6 +20,8 @@ import Cover from "@/components/Cover.vue";
 import DataList from "@/components/DataList.vue";
 import NoData from "@/components/NoData.vue";
 import ImageViewer from "./components/ImageViewer.vue";
+import EditorMarkdown from "./components/EditorMarkdown.vue";
+import EditorHtml from "./components/EditorHtml.vue";
 // import Loading from "@/components/Loading.vue";
 //全局方法
 //表单校验
@@ -45,12 +47,14 @@ app.component("Cover", Cover);
 app.component("DataList", DataList);
 app.component("NoData", NoData);
 app.component("ImageViewer", ImageViewer);
+app.component("EditorMarkdown", EditorMarkdown);
+app.component("EditorHtml", EditorHtml);
 app.use(router);
 app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;
 //定义全局变量
 app.config.globalProperties.globalInfo = {
-  bodyWidth: 1300,
+  bodyWidth: 1280,
   avatarUrl: "/api/file/getAvatar/",
   imageUrl: "/api/file/getImage/",
 };
