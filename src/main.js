@@ -22,6 +22,8 @@ import NoData from "@/components/NoData.vue";
 import ImageViewer from "./components/ImageViewer.vue";
 import EditorMarkdown from "./components/EditorMarkdown.vue";
 import EditorHtml from "./components/EditorHtml.vue";
+import CoverUpload from "./components/CoverUpload.vue";
+import AttachmentSelector from "./components/AttachmentSelector.vue";
 // import Loading from "@/components/Loading.vue";
 //全局方法
 //表单校验
@@ -49,6 +51,8 @@ app.component("NoData", NoData);
 app.component("ImageViewer", ImageViewer);
 app.component("EditorMarkdown", EditorMarkdown);
 app.component("EditorHtml", EditorHtml);
+app.component("CoverUpload", CoverUpload);
+app.component("AttachmentSelector", AttachmentSelector);
 app.use(router);
 app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;

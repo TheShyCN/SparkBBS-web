@@ -13,11 +13,12 @@
         class="post-panel"
       >
         <div class="post-editor">
-          <el-card :body-style="{ padding: '0' }">
+          <el-card :body-style="{ padding: '5px' }">
             <template #header>
               <span>正文</span>
             </template>
-            <EditorMarkdown></EditorMarkdown>
+            <EditorMarkdown :height="markdownHeight"></EditorMarkdown>
+            <!-- <EditorHtml :height="markdownHeight"></EditorHtml> -->
           </el-card>
         </div>
         <div class="post-setting">
@@ -43,14 +44,7 @@
               />
             </el-form-item>
             <el-form-item label="封面" prop="cover">
-              <el-cascader
-                placeholder="请选择版块"
-                :options="boardList"
-                :props="boardPros"
-                clearable
-                v-model="formData.boardIds"
-                :style="{ width: '100%' }"
-              />
+              <CoverUpload v-model="formData.cover"></CoverUpload>
             </el-form-item>
             <el-form-item label="摘要" prop="summary">
               <el-input
@@ -64,15 +58,8 @@
                 v-model.trim="formData.summary"
               ></el-input>
             </el-form-item>
-            <el-form-item label="附件" prop="boardIds">
-              <el-cascader
-                placeholder="请选择版块"
-                :options="boardList"
-                :props="boardPros"
-                clearable
-                v-model="formData.boardIds"
-                :style="{ width: '100%' }"
-              />
+            <el-form-item label="附件" prop="attachment">
+              <AttachmentSelector v-model="formData.attachment" />
             </el-form-item>
             <el-form-item label="" prop="title">
               <el-button type="primary" :style="{ width: '100%' }">
@@ -87,27 +74,60 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from "vue";
+import AttachmentSelector from "@/components/AttachmentSelector.vue";
+import { ref, getCurrentInstance, onMounted } from "vue";
 const { proxy } = getCurrentInstance();
 const formData = ref({});
 const formDataRef = ref();
 const rules = {
   title: [{ required: true, message: "请输入内容" }],
 };
+
+const markdownHeight = window.innerHeight - 60 - 80;
+const htmlEditorHeight = window.innerHeight - 60 - 150;
+
+const api = {
+  // 获取版块信息
+  loadBoard4Post: "/forum/loadBoard4Post",
+  // 发布文章
+  postArticle: "/forum/postArticle",
+  // 修改文章获取详情
+  articleDetail4Update: "/forum/articleDetail4Update",
+  // 修改文章
+  updateArticle: "/forum/updateArticle",
+};
+// 版块信息,展示到cascader组件
+const boardPros = {
+  multiple: false,
+  value: "boardId",
+  label: "boardName",
+};
+
+const boardList = ref([]);
+const loadBoardLst = async () => {
+  const result = await proxy.Request({
+    url: api.loadBoard4Post,
+  });
+  if (!result) return;
+  boardList.value = result.data;
+};
+onMounted(() => {
+  loadBoardLst();
+});
 </script>
 
 <style lang="scss" scoped>
 .edit-post {
   padding-left: 5px;
-  padding-right: 20px;
+  padding-right: 10px;
 
   .post-panel {
     display: flex;
     .post-setting {
       width: 450px;
-      margin-left: 15px;
-      .el-form-item {
-      }
+      margin-left: 5px;
+      height: calc(100vh - 75px);
+      overflow: scroll;
     }
     .post-editor {
       flex: 1;
