@@ -20,7 +20,6 @@
         :article-id="articleId"
         :user-id="currentUserId"
         :avatar-size="50"
-        :reply-user-id="articleUserId"
         :show-insert-img="currentUserId !== null"
         :placeholder-info="'请文明发言! 做一个互联网新时代好青年!'"
         @post-comment-finish="postCommentFish"
@@ -39,6 +38,7 @@
             :article-user-id="articleUserId"
             :current-user-id="currentUserId"
             @hideAllReply="handlerHideAllReply"
+            @reloadData="loadComment"
           ></CommentListItem>
         </template>
       </DataList>
@@ -67,12 +67,6 @@ const commentListInfo = ref({});
 const api = {
   // 获取评论
   loadComment: "/comment/loadComment",
-  // 发布评论
-  postComment: "/comment/postComment",
-  // 评论点赞
-  doLike: "/comment/doLike",
-  // 置顶
-  changeTopType: "/comment/changeTopType",
 };
 
 watch(
@@ -100,7 +94,7 @@ const loadComment = async (pageNo) => {
     url: api.loadComment,
     params: {
       // pageNo: commentListInfo.value.pageNo,
-      pageNo: pageNo || 1,
+      pageNo: pageNo,
       articleId: props.articleId,
       orderType: orderType.value,
     },

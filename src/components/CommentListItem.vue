@@ -9,7 +9,11 @@
         >
       </div>
       <div class="comment-content">
-        <div v-html="data.content"></div>
+        <div>
+          <span class="tag-topping" v-if="data.topType === 1">置顶</span>
+          <span class="tag-no-audit" v-if="data.status === 0">待审核</span>
+          <span v-html="data.content"></span>
+        </div>
         <CommentImage
           :style="{ marginTop: '10px' }"
           v-if="data.imgPath"
@@ -34,7 +38,7 @@
           <div class="iconfont icon-more"></div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>
+              <el-dropdown-item @click="opTopType(data)">
                 {{ data.topType === 0 ? "设为置顶" : "取消置顶" }}
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -98,6 +102,8 @@ import { ref, getCurrentInstance } from "vue";
 const { proxy } = getCurrentInstance();
 const api = {
   doLike: "/comment/doLike",
+  // 置顶
+  changeTopType: "/comment/changeTopType",
 };
 //点赞
 const doLike = async (commentData) => {
@@ -131,7 +137,7 @@ const placeholder = ref(null);
 const pCommentId = ref(0);
 const replyUserId = ref(null);
 
-const emit = defineEmits(["hideAllReply"]);
+const emit = defineEmits(["hideAllReply", "reloadData"]);
 
 const showReply = (commentData) => {
   // 存储变化前的值
@@ -149,6 +155,20 @@ const postCommentFish = (commentData) => {
     ? (props.data.children = commentData)
     : props.data.children.unshift(commentData[commentData.length - 1]);
   props.data.showReplyInfo = false;
+};
+
+// 置顶评论
+const opTopType = async (data) => {
+  const result = await proxy.Request({
+    url: api.changeTopType,
+    params: {
+      commentId: data.commentId,
+      topType: data.topType === 1 ? 0 : 1,
+    },
+  });
+  if (!result) return;
+  proxy.Message.success(`${data.topType === 0 ? "置顶" : "取消置顶"}成功!`);
+  emit("reloadData");
 };
 </script>
 
@@ -177,6 +197,18 @@ const postCommentFish = (commentData) => {
     .comment-content {
       margin-top: 10px;
       font-size: 18px;
+      .tag-topping,
+      .tag-no-audit {
+        font-size: 14px;
+        margin-right: 5px;
+        color: var(--pink);
+        border: 1px solid var(--pink);
+        border-radius: 3px;
+      }
+      .tag-no-audit {
+        border-color: var(--text2);
+        color: var(--text2);
+      }
     }
     .info {
       margin-top: 10px;
