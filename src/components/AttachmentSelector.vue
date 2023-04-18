@@ -53,6 +53,7 @@ const delFile = () => {
     width: 20px;
     margin-left: 10px;
     color: var(--link);
+    cursor: pointer;
   }
 }
 </style>

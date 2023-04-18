@@ -38,9 +38,13 @@ const props = defineProps({
 });
 
 const mode = ref("default");
-const editorRef = shallowRef();
+const editorRef = shallowRef(null);
 
 const toolbarConfig = {
+  excludeKeys: ["uploadVideo"],
+};
+
+const editorConfig = {
   placeholder: "请输入内容...",
   excludeKeys: ["uploadVideo"],
   MENU_CONF: {
