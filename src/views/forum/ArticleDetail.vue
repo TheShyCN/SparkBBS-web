@@ -20,12 +20,16 @@
       <span class="iconfont icon-right" v-if="articleInfo.boardId"></span>
       <span>{{ articleInfo.title }}</span>
     </div>
+    <!-- 文章详情 -->
     <div
       class="detail-container"
       :style="{ width: proxy.globalInfo.bodyWidth - 300 + 'px' }"
     >
       <div class="article-detail">
-        <div class="title">{{ articleInfo.title }}</div>
+        <div class="title">
+          {{ articleInfo.title }}
+          <el-tag type="danger" v-if="articleInfo.status === 0">待审核</el-tag>
+        </div>
         <div class="user-info">
           <Avatar
             :userId="articleInfo.userId"
@@ -42,6 +46,12 @@
               <span class="read iconfont icon-eye-solid">
                 {{ articleInfo.readCount }}
               </span>
+              <router-link
+                :to="`/editPost/${articleInfo.articleId}`"
+                v-if="articleInfo?.userId === userStore.loginUserInfo?.userId"
+              >
+                <span class="iconfont icon-edit">编辑</span>
+              </router-link>
             </div>
           </div>
         </div>
@@ -77,6 +87,28 @@
           :article-user-id="articleInfo.userId"
           @updateCommentCount="updateCommentCount"
         ></CommentList>
+      </div>
+    </div>
+    <!-- 目录 -->
+    <div class="toc-panel">
+      <div class="top-container">
+        <div class="toc-title">目录</div>
+        <div class="toc-list">
+          <template v-if="!tocArray.length">
+            <div class="no-toc">未解析到目录</div>
+          </template>
+          <template v-else>
+            <div
+              v-for="(toc, index) in tocArray"
+              :key="index"
+              :class="{ active: activeId === toc.id }"
+              @click="gotoAnchor(toc.id)"
+              :style="{ paddingLeft: toc.level * 15 + 'px' }"
+            >
+              {{ toc.title }}
+            </div>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -174,16 +206,8 @@ const getArticleDetail = async () => {
   boardStore.activeBoardId = result.data.forumArticle.boardId;
   imagePreview();
   highlightCode();
+  makeToc();
 };
-
-onMounted(() => {
-  getArticleDetail();
-  window.addEventListener("resize", listenResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("resize", listenResize);
-});
 
 //快捷操作的偏移量
 const quickPanelLeft = ref(
@@ -292,6 +316,72 @@ const highlightCode = () => {
 const updateCommentCount = () => {
   articleInfo.value.commentCount += 1;
 };
+
+// 获取目录
+const tocArray = ref([]);
+const makeToc = () => {
+  nextTick(() => {
+    const contentDom = document.querySelector("#detail").childNodes;
+    const tocTags = ["H1", "H2", "H3", "H4", "H5", "H6"];
+    // 添加id,跳转
+    let index = 0;
+    contentDom.forEach((item) => {
+      if (tocTags.includes(item.tagName)) {
+        item.setAttribute("id", `toc-${index}`);
+
+        tocArray.value.push({
+          id: `toc-${index}`,
+          title: item.innerText,
+          level: Number(item.tagName.slice(-1)),
+          offsetTop: item.offsetTop,
+        });
+        index++;
+      }
+    });
+  });
+};
+const activeId = ref(0);
+
+const getScrollTop = () => {
+  // 浏览器兼容性不同,这里给出三个值
+  return (
+    document.documentElement.scrollTop ||
+    window.pageYOffset ||
+    document.body.scrollTop
+  );
+};
+
+const gotoAnchor = (domId) => {
+  activeId.value = domId;
+  document
+    .querySelector(`#${domId}`)
+    .scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+const listenScroll = () => {
+  const currentPosition = getScrollTop();
+  tocArray.value.forEach((item, index) => {
+    if (
+      (currentPosition > item.offsetTop &&
+        currentPosition < tocArray.value[index + 1]?.offsetTop) ||
+      (index === tocArray.value.length - 1 &&
+        currentPosition > tocArray.value[index].offsetTop)
+    ) {
+      activeId.value = item.id;
+    }
+  });
+};
+
+onMounted(() => {
+  getArticleDetail();
+  window.addEventListener("resize", listenResize);
+  window.addEventListener("scroll", listenScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", listenResize);
+  window.removeEventListener("scroll", listenScroll);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -309,9 +399,20 @@ const updateCommentCount = () => {
     padding: 15px;
     .title {
       font-weight: 900;
+      font-size: 20px;
+      display: flex;
+      .el-tag {
+        margin-left: 10px;
+      }
     }
     .user-info {
       margin-top: 20px;
+      a {
+        text-decoration: none;
+      }
+      .icon-edit {
+        color: var(--link);
+      }
     }
   }
   .attachment-panel {
@@ -413,6 +514,50 @@ const updateCommentCount = () => {
     background-color: var(--link);
     span {
       color: #fff;
+    }
+  }
+}
+.container-body {
+  position: relative;
+  .toc-panel {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 285px;
+
+    .top-container {
+      position: fixed;
+      width: 285px;
+      background: #fff;
+      box-shadow: 1px 2px 5px 0 rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+      .toc-title {
+        border-bottom: 2px solid #ddd;
+        padding: 10px;
+        font-weight: 500;
+        font-size: 18px;
+      }
+      .toc-list {
+        padding: 5px;
+        max-height: calc(100vh - 200px);
+        overflow: auto;
+        div {
+          box-sizing: border-box;
+          padding-left: 20px;
+          height: 35px;
+          line-height: 35px;
+          cursor: pointer;
+          color: var(--text2);
+        }
+        div:hover {
+          border-left: skyblue 2px solid;
+          background: #f1f1f1;
+        }
+        .active {
+          border-left: skyblue 2px solid;
+          background: #f1f1f1;
+        }
+      }
     }
   }
 }

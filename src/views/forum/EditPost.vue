@@ -35,12 +35,12 @@
                 v-model="formData.markdownContent"
                 :height="markdownHeight"
                 @htmlContent="setHtmlContent"
-                v-if="editorType === 1"
+                v-show="editorType === 1"
               ></EditorMarkdown>
               <EditorHtml
                 v-model="formData.content"
                 :height="htmlEditorHeight"
-                v-if="editorType === 0"
+                v-show="editorType === 0"
               ></EditorHtml>
             </el-form-item>
           </el-card>
@@ -187,7 +187,7 @@ const getArticleDetail = () => {
   nextTick(async () => {
     formDataRef.value.resetFields();
     if (articleId.value) {
-      console.log("修改");
+      editorType.value = Number(proxy.VueCookies.get("editorType")) || 0;
       const result = await proxy.Request({
         url: api.articleDetail4Update,
         params: {
