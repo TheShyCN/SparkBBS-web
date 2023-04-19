@@ -60,7 +60,9 @@ defineProps({
   min-height: 100vh;
   /* 简单背景渐变色 */
   background: rgb(106, 162, 245, 0.5);
-  position: fixed;
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 3000;
   width: 100%;
 }
