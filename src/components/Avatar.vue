@@ -96,9 +96,6 @@ const goToUserCenter = () => {
   }
 }
 
-.avatar {
-  box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.3);
-}
 .avatar:hover {
   .circle-1 {
     transform: rotate(360deg);
