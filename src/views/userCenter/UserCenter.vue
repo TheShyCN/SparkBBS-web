@@ -65,18 +65,29 @@
         </div>
       </div>
       <div class="right">
-        <el-tabs v-model="activeTagName">
-          <el-tab-pane label="发帖" :name="0"> </el-tab-pane>
+        <el-tabs v-model="activeTabName" @tab-change="changeTab">
+          <el-tab-pane label="发帖" :name="0"></el-tab-pane>
           <el-tab-pane label="评论" :name="1"></el-tab-pane>
           <el-tab-pane label="点赞" :name="2"></el-tab-pane>
         </el-tabs>
-        <DataList :dataSource="articleListInfo" :loading="isLoading"></DataList>
+        <div class="article-list">
+          <DataList
+            :dataSource="articleListInfo"
+            :loading="isLoading"
+            @loadData="loadUserArticle(activeTabName)"
+          >
+            <template #default="{ dataItem }">
+              <ArticleListItem :data="dataItem"></ArticleListItem>
+            </template>
+          </DataList>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import ArticleListItem from "@/views/forum/ArticleListItem.vue";
 import { getCurrentInstance, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useUserStore } from "@/store/user";
@@ -105,17 +116,18 @@ const requestUserInfo = async () => {
   });
   if (!result) return;
   userInfo.value = result.data;
-  loadUserArticle(0);
+  loadUserArticle();
 };
 const articleListInfo = ref([]);
 const isLoading = ref(false);
-const loadUserArticle = async (type) => {
+const loadUserArticle = async () => {
   isLoading.value = true;
   const result = await proxy.Request({
     url: api.loadUserArticle,
     params: {
+      pageNo: articleListInfo.value.pageNo,
       userId: userInfo.value.userId,
-      type,
+      type: activeTabName.value,
     },
   });
   isLoading.value = false;
@@ -123,7 +135,12 @@ const loadUserArticle = async (type) => {
   articleListInfo.value = result.data;
 };
 
-const activeTagName = ref(0);
+const changeTab = (type) => {
+  activeTabName.value = type;
+  loadUserArticle();
+};
+
+const activeTabName = ref(0);
 onMounted(() => {
   requestUserInfo();
 });
@@ -140,7 +157,7 @@ onMounted(() => {
 .user-center {
   display: flex;
   width: 100%;
-  height: 400px;
+
   .left {
     flex: 1;
     margin-right: 10px;
@@ -200,9 +217,15 @@ onMounted(() => {
   .right {
     box-sizing: border-box;
     width: 990px;
-    min-height: 410px;
     background: #fff;
     padding: 15px;
+    height: 100%;
+    .article-list {
+      margin-top: -15px;
+    }
+    #tab-0 {
+      font-size: 20px;
+    }
   }
 }
 </style>
