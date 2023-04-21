@@ -14,6 +14,7 @@
           <div
             class="a-link"
             v-if="userStore.loginUserInfo?.userId === userInfo.userId"
+            @click="updateUserInfo"
           >
             修改资料
           </div>
@@ -83,10 +84,15 @@
         </div>
       </div>
     </div>
+    <UserCenterEditInfo
+      ref="userCenterEditInfoRef"
+      @reset-user-info="restUserInfoHandler"
+    />
   </div>
 </template>
 
 <script setup>
+import UserCenterEditInfo from "./UserCenterEditInfo.vue";
 import ArticleListItem from "@/views/forum/ArticleListItem.vue";
 import { getCurrentInstance, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -98,7 +104,6 @@ const api = {
   getUserInfo: "/ucenter/getUserInfo",
   // 获取积分记录
   loadUserIntegralRecord: "/ucenter/loadUserIntegralRecord",
-  updateUserInfo: "/ucenter/updateUserInfo",
   // 获取用户发帖
   loadUserArticle: "/ucenter/loadUserArticle",
   // 获取用户消息数
@@ -141,6 +146,15 @@ const changeTab = (type) => {
 };
 
 const activeTabName = ref(0);
+
+const userCenterEditInfoRef = ref();
+const updateUserInfo = () => {
+  userCenterEditInfoRef.value.showEditUserInfoDialog(userInfo.value);
+};
+const restUserInfoHandler = (data) => {
+  userInfo.value = data;
+};
+
 onMounted(() => {
   requestUserInfo();
 });

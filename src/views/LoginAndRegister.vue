@@ -261,7 +261,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, nextTick, getCurrentInstance, onMounted } from "vue";
+import { ref, reactive, nextTick, getCurrentInstance } from "vue";
 import md5 from "js-md5";
 import { useUserStore } from "@/store/user";
 
@@ -331,9 +331,6 @@ const checkRepeatPassword = (rule, value, callback) => {
     callback();
   }
 };
-onMounted(() => {
-  // console.log(proxy.Verify.email);
-});
 
 const rules = {
   email: [

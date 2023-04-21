@@ -70,6 +70,7 @@ const close = () => {
 <style lang="scss" scoped>
 .custom-dialog {
   .dialog-body {
+    padding: 10px 25px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     min-height: 100px;
