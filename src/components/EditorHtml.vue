@@ -90,5 +90,6 @@ const handlerCreate = (editor) => {
 <style lang="scss" scoped>
 .editor-html {
   border: 1px solid #ddd;
+  z-index: 1001;
 }
 </style>
