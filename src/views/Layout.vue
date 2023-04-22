@@ -68,27 +68,98 @@
         <template v-if="userInfo.userId">
           <div class="message-info">
             <el-dropdown>
-              <el-badge :value="2" class="item">
+              <el-badge
+                :value="messageCountInfo.total"
+                class="item"
+                :hidden="!messageCountInfo.total"
+              >
                 <div class="iconfont icon-message"></div>
               </el-badge>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>回复我的</el-dropdown-item>
-                  <el-dropdown-item>赞了我的文章</el-dropdown-item>
-                  <el-dropdown-item>下载了我的附件</el-dropdown-item>
-                  <el-dropdown-item>赞了我的评论</el-dropdown-item>
-                  <el-dropdown-item>系统消息</el-dropdown-item>
+                  <el-dropdown-item
+                    @click="gotoMessage('reply')"
+                    class="message-item"
+                  >
+                    <span class="text">回复我的</span>
+                    <span class="count-tag" v-if="messageCountInfo.reply">
+                      {{
+                        messageCountInfo.reply > 99
+                          ? "99+"
+                          : messageCountInfo.reply
+                      }}
+                    </span>
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click="gotoMessage('likePost')"
+                    class="message-item"
+                  >
+                    <span class="text">赞了我的文章</span>
+                    <span class="count-tag" v-if="messageCountInfo.likePost">
+                      {{
+                        messageCountInfo.likePost > 99
+                          ? "99+"
+                          : messageCountInfo.likePost
+                      }}
+                    </span>
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click="gotoMessage('downloadAttachment')"
+                    class="message-item"
+                  >
+                    <span class="text">下载了我的附件</span>
+                    <span
+                      class="count-tag"
+                      v-if="messageCountInfo.downloadAttachment"
+                    >
+                      {{
+                        messageCountInfo.downloadAttachment > 99
+                          ? "99+"
+                          : messageCountInfo.downloadAttachment
+                      }}
+                    </span>
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click="gotoMessage('likeComment')"
+                    class="message-item"
+                  >
+                    <span class="text">赞了我的评论</span>
+                    <span class="count-tag" v-if="messageCountInfo.likeComment">
+                      {{
+                        messageCountInfo.likeComment > 99
+                          ? "99+"
+                          : messageCountInfo.likeComment
+                      }}
+                    </span>
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click="gotoMessage('sys')"
+                    class="message-item"
+                  >
+                    <span class="text">系统消息</span>
+                    <span class="count-tag" v-if="messageCountInfo.sys">
+                      {{
+                        messageCountInfo.sys > 99 ? "99+" : messageCountInfo.sys
+                      }}
+                    </span>
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </div>
           <div class="user-Info">
             <el-dropdown>
-              <Avatar userId="1890524956" :size="50"></Avatar>
+              <Avatar
+                :userId="userStore.loginUserInfo.userId"
+                :size="50"
+              ></Avatar>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>我的主页</el-dropdown-item>
-                  <el-dropdown-item>退出</el-dropdown-item>
+                  <el-dropdown-item
+                    @click="router.push(`/user/${userInfo.userId}`)"
+                    >我的主页</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="logout">退出</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -113,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, onMounted, watch } from "vue";
+import { ref, getCurrentInstance, onMounted, watch, provide } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import LoginAndRegister from "@/views/LoginAndRegister.vue";
 import { useUserStore } from "@/store/user";
@@ -131,6 +202,8 @@ const showHeader = ref(true);
 const api = {
   getUserInfo: "/getUserInfo",
   loadBoard: "/board/loadBoard",
+  loadMessageCount: "/ucenter/getMessageCount",
+  logout: "/logout",
 };
 //点击版块路由跳转
 const boardClickHandler = (board) => {
@@ -238,6 +311,7 @@ const { loginUserInfo, showLogin } = storeToRefs(userStore);
 watch(loginUserInfo, (newVal) => {
   if (newVal !== undefined && newVal !== null) {
     userInfo.value = newVal;
+    loadMessageCount();
   } else {
     userInfo.value = {};
   }
@@ -258,6 +332,36 @@ const loadBoard = async () => {
   if (!result) return;
   boardList.value = result.data;
   boardStore.saveBoardList(result.data);
+};
+//跳转到消息中心
+const gotoMessage = (type) => {
+  router.push(`/user/message/${type}`);
+};
+
+//消息数
+const messageCountInfo = ref({});
+const updateMessageCountInfo = (type) => {
+  messageCountInfo.value.total -= messageCountInfo.value[type];
+  messageCountInfo.value[type] = 0;
+};
+provide("messageCountInfo", { messageCountInfo, updateMessageCountInfo });
+
+const loadMessageCount = async () => {
+  const result = await proxy.Request({
+    url: api.loadMessageCount,
+  });
+  if (!result) return;
+  messageCountInfo.value = result.data;
+};
+
+const logout = () => {
+  proxy.Confirm("确定要退出么?", async () => {
+    const result = await proxy.Request({
+      url: api.logout,
+    });
+    if (!result) return;
+    userStore.updateLoginUserInfo(null);
+  });
 };
 </script>
 
@@ -391,6 +495,7 @@ const loadBoard = async () => {
     }
   }
 }
+
 .sub-board-list {
   display: flex;
   flex-wrap: wrap;
@@ -419,6 +524,21 @@ const loadBoard = async () => {
   }
   .menu-item:hover::after {
     opacity: 0 !important;
+  }
+}
+
+.message-item {
+  .count-tag {
+    display: block;
+    min-width: 20px;
+    min-height: 20px;
+    border-radius: 50%;
+    background: #ec6b6b;
+    text-align: center;
+    color: #fff;
+    margin-left: 10px;
+    line-height: 20px;
+    font-size: 12px;
   }
 }
 </style>
