@@ -179,6 +179,43 @@
   <div class="body-content">
     <router-view />
   </div>
+  <div class="footer">
+    <div
+      class="footer-content"
+      :style="{ width: proxy.globalInfo.bodyWidth + 'px' }"
+    >
+      <el-row>
+        <el-col class="item" :span="6">
+          <div class="logo">
+            <div class="logo-letter">
+              <span v-for="item in logoInfo" :style="{ color: item.color }">{{
+                item.letter
+              }}</span>
+              <div class="info">编程改变世界</div>
+            </div>
+          </div>
+        </el-col>
+        <el-col class="item" :span="6">
+          <div class="title">网站相关</div>
+          <div class="link">敬请期待</div>
+          <div class="link">敬请期待</div>
+          <div class="link">敬请期待</div>
+        </el-col>
+        <el-col class="item" :span="6">
+          <div class="title">友情链接</div>
+          <div class="link">广告位招租</div>
+          <div class="link">广告位招租</div>
+          <div class="link">广告位招租</div>
+        </el-col>
+        <el-col class="item" :span="6">
+          <div class="title">关注站长</div>
+          <div class="weixin">
+            <img src="@/assets/images/wx.png" />
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
   <!-- 登录注册页面 -->
   <LoginAndRegister ref="loginAndRegisterRef" />
 </template>
@@ -515,6 +552,7 @@ const logout = () => {
 }
 .body-content {
   margin-top: 60px;
+  min-height: calc(100vh - 240px);
 }
 .active {
   background-color: #409eff !important;
@@ -539,6 +577,39 @@ const logout = () => {
     margin-left: 10px;
     line-height: 20px;
     font-size: 12px;
+  }
+}
+.footer {
+  background: #e9e7e7;
+  margin-top: 10px;
+  height: 150px;
+  padding: 10px;
+  .footer-content {
+    margin: 0 auto;
+    .logo-letter {
+      font-size: 50px;
+      .info {
+        margin-top: 20px;
+        font-size: 30px;
+        font-weight: 600;
+      }
+    }
+    .title {
+      font-size: 25px;
+      margin-bottom: 10px;
+    }
+    .weixin {
+      img {
+        width: 110px;
+        height: 110px;
+      }
+    }
+    .link {
+      margin-top: 15px;
+      margin-left: 5px;
+      color: var(--text2);
+      cursor: pointer;
+    }
   }
 }
 </style>

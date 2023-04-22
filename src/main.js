@@ -58,7 +58,7 @@ app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;
 //定义全局变量
 app.config.globalProperties.globalInfo = {
-  bodyWidth: 1280,
+  bodyWidth: 1260,
   avatarUrl: "/api/file/getAvatar/",
   imageUrl: "/api/file/getImage/",
 };
