@@ -143,7 +143,11 @@
       </div>
     </el-badge>
     <!-- 附件 -->
-    <div class="quick-item" @click="goToPosition('view-attachment')">
+    <div
+      class="quick-item"
+      @click="goToPosition('view-attachment')"
+      v-if="attachment"
+    >
       <span class="iconfont icon-attachment"></span>
     </div>
     <ImageViewer
