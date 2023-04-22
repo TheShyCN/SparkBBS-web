@@ -261,7 +261,7 @@ const attachmentDownloadHandler = async () => {
   // 0积分或当前用户为作者,直接下载
   if (
     attachment.value.integral === 0 ||
-    currentUserId !== articleInfo.value.userId
+    currentUserId === articleInfo.value.userId
   ) {
     downloadFile();
     return;
