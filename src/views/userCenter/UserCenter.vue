@@ -44,6 +44,7 @@
               :class="{
                 'a-link': userStore.loginUserInfo?.userId === userInfo.userId,
               }"
+              @click="showIntegralRecord"
               >{{ userInfo.currentIntegral }}</span
             >
           </div>
@@ -88,10 +89,12 @@
       ref="userCenterEditInfoRef"
       @reset-user-info="restUserInfoHandler"
     />
+    <UserIntegralRecord ref="userIntegralRecordRef" />
   </div>
 </template>
 
 <script setup>
+import UserIntegralRecord from "./UserIntegralRecord.vue";
 import UserCenterEditInfo from "./UserCenterEditInfo.vue";
 import ArticleListItem from "@/views/forum/ArticleListItem.vue";
 import { getCurrentInstance, onMounted, ref } from "vue";
@@ -153,6 +156,13 @@ const updateUserInfo = () => {
 };
 const restUserInfoHandler = (data) => {
   userInfo.value = data;
+};
+
+const userIntegralRecordRef = ref();
+const showIntegralRecord = () => {
+  if (userStore.loginUserInfo.userId === userInfo.value.userId) {
+    userIntegralRecordRef.value.showRecord();
+  }
 };
 
 onMounted(() => {

@@ -48,8 +48,7 @@
 
 <script setup>
 import { ref, reactive, getCurrentInstance, nextTick } from "vue";
-import { useRoute, useRouter } from "vue-router";
-const route = useRoute();
+import { useRouter } from "vue-router";
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 const api = {
