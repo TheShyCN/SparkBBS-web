@@ -17,6 +17,7 @@
       layout="prev, pager, next"
       :current-page="dataSource.pageNo"
       @update:current-page="handlePageNoChange"
+      :page-size="15"
     >
     </el-pagination>
   </div>

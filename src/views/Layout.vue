@@ -12,14 +12,14 @@
       <!-- 版块信息 -->
       <div class="menu-panel">
         <div>
-          <div :class="{ active: boardStore.$state.activePBoardId == 0 }">
+          <div :class="{ active: boardStore.activePBoardId === 0 }">
             <router-link class="menu-item" to="/">首页</router-link>
           </div>
           <div
             v-for="(item, index) in boardList"
             :key="index"
             :class="{
-              active: boardStore.$state.activePBoardId == item.boardId,
+              active: boardStore.activePBoardId == item.boardId,
             }"
           >
             <el-popover

@@ -29,5 +29,8 @@ export const useBoardStore = defineStore("board", {
     saveBoardList(value) {
       this.boardList = value;
     },
+    updateActivePBoardId(value) {
+      this.activePBoardId = value;
+    },
   },
 });
