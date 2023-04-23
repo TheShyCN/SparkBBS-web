@@ -26,7 +26,8 @@
           </template>
         </div>
         <router-link :to="`/post/${data.articleId}`" class="a-link title">
-          <span v-if="data.topType == 1" class="top">置顶</span>
+          <span v-if="data.topType === 1" class="top">置顶</span>
+          <span v-if="data.status === 0" class="tag tag-no-audit">待审核</span>
           <span>{{ data.title }}</span>
         </router-link>
         <div class="summary">{{ data.summary }}</div>
@@ -37,7 +38,7 @@
           <span class="iconfont icon-good">
             {{ data.goodCount === 0 ? "点赞" : data.goodCount }}
           </span>
-          <span class="iconfont icon-comment">
+          <span class="iconfont icon-comment" v-if="sysSettingInfo.commentOpen">
             {{ data.commentCount === 0 ? "评论" : data.commentCount }}
           </span>
         </div>
@@ -53,6 +54,10 @@
 </template>
 
 <script setup>
+import { inject } from "vue";
+// 是否展示评论
+const sysSettingInfo = inject("sysSettingInfo");
+
 const props = defineProps({
   data: {
     type: Object,

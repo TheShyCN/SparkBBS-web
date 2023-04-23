@@ -241,6 +241,8 @@ const api = {
   loadBoard: "/board/loadBoard",
   loadMessageCount: "/ucenter/getMessageCount",
   logout: "/logout",
+  // 获取系统设置
+  getSysSetting: "/getSysSetting",
 };
 //点击版块路由跳转
 const boardClickHandler = (board) => {
@@ -332,6 +334,7 @@ onMounted(() => {
   initScroll();
   getUserInfo();
   loadBoard();
+  loadSysSetting();
 });
 
 const getUserInfo = async () => {
@@ -399,6 +402,16 @@ const logout = () => {
     if (!result) return;
     userStore.updateLoginUserInfo(null);
   });
+};
+
+const sysSettingInfo = ref(null);
+provide("sysSettingInfo", sysSettingInfo);
+const loadSysSetting = async () => {
+  let result = await proxy.Request({
+    url: api.getSysSetting,
+  });
+  if (!result) return;
+  sysSettingInfo.value = result.data;
 };
 </script>
 

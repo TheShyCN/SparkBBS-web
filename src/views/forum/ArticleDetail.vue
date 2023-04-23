@@ -81,7 +81,11 @@
         </div>
       </div>
       <!-- 评论 -->
-      <div class="comment-panel" id="view-comment">
+      <div
+        class="comment-panel"
+        id="view-comment"
+        v-if="sysSettingInfo.commentOpen && articleInfo.status === 1"
+      >
         <CommentList
           :article-id="articleInfo.articleId"
           :article-user-id="articleInfo.userId"
@@ -137,6 +141,7 @@
       :value="articleInfo?.commentCount"
       type="info"
       :hide="articleInfo?.commentCount"
+      v-if="sysSettingInfo.commentOpen"
     >
       <div class="quick-item" @click="goToPosition('view-comment')">
         <span class="iconfont icon-comment"></span>
@@ -158,7 +163,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, getCurrentInstance, onUnmounted, nextTick } from "vue";
+import {
+  ref,
+  onMounted,
+  getCurrentInstance,
+  onUnmounted,
+  nextTick,
+  inject,
+} from "vue";
 import { useRoute } from "vue-router";
 import Utils from "@/utils/Utils.js";
 import { useUserStore } from "@/store/user";
@@ -375,6 +387,8 @@ const listenScroll = () => {
     }
   });
 };
+// 是否展示评论
+const sysSettingInfo = inject("sysSettingInfo");
 
 onMounted(() => {
   getArticleDetail();

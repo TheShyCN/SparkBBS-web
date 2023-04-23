@@ -79,3 +79,15 @@ body {
 .el-dropdown-menu__item {
   justify-content: space-between;
 }
+
+.tag {
+  font-size: 12px;
+  border-radius: 3px;
+  padding: 0 5px;
+  margin-right: 5px;
+  font-weight: normal;
+}
+.tag-no-audit {
+  color: var(--text2);
+  border: 1px solid var(--text2);
+}
