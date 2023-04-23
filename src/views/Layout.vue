@@ -55,8 +55,14 @@
       </div>
       <!-- 搜索 -->
       <div class="search-box">
-        <input class="search-txt" type="text" placeholder="Type to search" />
-        <button class="search-btn">
+        <input
+          class="search-txt"
+          type="text"
+          placeholder="探索知识~"
+          v-model="searchKeyword"
+          @keyup.enter="router.push('/search')"
+        />
+        <button class="search-btn" @click="router.push('/search')">
           <span class="iconfont icon-search"></span>
         </button>
       </div>
@@ -413,6 +419,12 @@ const loadSysSetting = async () => {
   if (!result) return;
   sysSettingInfo.value = result.data;
 };
+
+const searchKeyword = ref("");
+const resetSearchKeyword = () => {
+  searchKeyword.value = "";
+};
+provide("searchKeyword", { searchKeyword, resetSearchKeyword });
 </script>
 
 <style lang="scss" scoped>

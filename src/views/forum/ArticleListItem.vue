@@ -28,7 +28,8 @@
         <router-link :to="`/post/${data.articleId}`" class="a-link title">
           <span v-if="data.topType === 1" class="top">置顶</span>
           <span v-if="data.status === 0" class="tag tag-no-audit">待审核</span>
-          <span>{{ data.title }}</span>
+          <span v-html="data.title" v-if="HtmlTitle"></span>
+          <span v-else>{{ data.title }}</span>
         </router-link>
         <div class="summary">{{ data.summary }}</div>
         <div class="article-info">
@@ -61,6 +62,10 @@ const sysSettingInfo = inject("sysSettingInfo");
 const props = defineProps({
   data: {
     type: Object,
+  },
+  HtmlTitle: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

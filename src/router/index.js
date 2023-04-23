@@ -56,6 +56,12 @@ const router = createRouter({
           name: "MessageList",
           component: () => import("@/views/userCenter/MessageList.vue"),
         },
+        {
+          //消息中心
+          path: "/search",
+          name: "Search",
+          component: () => import("@/views/Search.vue"),
+        },
       ],
     },
     {
