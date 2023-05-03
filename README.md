@@ -1,6 +1,7 @@
 # 简介
 
 本项目是基于 vue3 + vite + vue-router + pinia + elementUI-plus 实现的类似于掘金的技术论坛访客端
+[项目展示](http://150.158.92.150:8010/)
 
 # 功能介绍
 
