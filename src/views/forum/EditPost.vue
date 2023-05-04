@@ -265,7 +265,6 @@ const postHandler = () => {
     if (!(params.attachment instanceof File)) {
       delete params.attachment;
     }
-    params.integral = formData.value.integral || null;
     if (formData.value.boardIds.length === 1) {
       params.pBoardId = formData.value.boardIds[0];
     } else {
